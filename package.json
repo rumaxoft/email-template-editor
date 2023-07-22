@@ -22,7 +22,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint:es": "eslint --ext .js,.jsx,.ts,.tsx src",
-    "lint:es:fix": "npm run lint:es -- --fix"
+    "lint:es:fix": "npm run lint:es -- --fix",
+    "lint:css": "stylelint src",
+    "lint:css:fix": "npm run lint:css -- --fix"
   },
   "browserslist": {
     "production": [
@@ -40,6 +42,11 @@
     "eslint-config-prettier": "^8.8.0",
     "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-prettier": "^5.0.0",
-    "prettier": "^3.0.0"
+    "prettier": "^3.0.0",
+    "stylelint": "^15.10.2",
+    "stylelint-config-clean-order": "^5.0.1",
+    "stylelint-config-standard": "^34.0.0",
+    "stylelint-order": "^6.0.3",
+    "stylelint-prettier": "^4.0.0"
   }
 }
