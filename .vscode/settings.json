@@ -1,0 +1,17 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "stylelint.useLocal": true,
+  "stylelint.autoFixOnSave": true,
+  "cSpell.language": "en,ru",
+  "cSpell.words": ["antd", "reduxjs"],
+  "todohighlight.keywords": [
+    {
+      "text": "TODO:",
+      "color": "white",
+      "border": "1px solid white",
+      "backgroundColor": "rgba(46,24,83,0.5)",
+      "isWholeLine": true
+    }
+  ]
+}
