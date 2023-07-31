@@ -26,7 +26,7 @@
   border-width: var(--border-btn, 1px);
   animation: button-pop var(--animation-btn, 0.25s) ease-out;
   text-transform: var(--btn-text-case, uppercase);
-  --tw-border-opacity: 1;
+  --tw-border-opacity: 0;
   --tw-bg-opacity: 1;
   background-color: hsl(var(--b2) / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
