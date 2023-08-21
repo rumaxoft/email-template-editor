@@ -1,0 +1,121 @@
+{
+  "value": [
+    {
+      "value": [
+        {
+          "value": "Hello, ",
+          "type": "text"
+        },
+        {
+          "value": "firstname",
+          "type": "value"
+        },
+        {
+          "value": "!\n\nI just went through your profile and I would love to join your network!",
+          "type": "text"
+        }
+      ],
+      "type": "textValue"
+    },
+    {
+      "value": [
+        {
+          "value": [
+            {
+              "value": "company",
+              "type": "value"
+            }
+          ],
+          "type": "if"
+        },
+        {
+          "value": [
+            {
+              "value": [
+                {
+                  "value": "\nI know you work at ",
+                  "type": "text"
+                },
+                {
+                  "value": "company",
+                  "type": "value"
+                }
+              ],
+              "type": "textValue"
+            },
+            {
+              "value": [
+                {
+                  "value": [
+                    {
+                      "value": "position",
+                      "type": "value"
+                    }
+                  ],
+                  "type": "if"
+                },
+                {
+                  "value": [
+                    {
+                      "value": " as ",
+                      "type": "text"
+                    },
+                    {
+                      "value": "position",
+                      "type": "value"
+                    },
+                    {
+                      "value": ".",
+                      "type": "text"
+                    }
+                  ],
+                  "type": "thenElse"
+                },
+                {
+                  "value": [
+                    {
+                      "value": ", but what is your role?",
+                      "type": "text"
+                    }
+                  ],
+                  "type": "thenElse"
+                }
+              ],
+              "type": "ifThenElse"
+            },
+            {
+              "value": [
+                {
+                  "value": ";)",
+                  "type": "text"
+                }
+              ],
+              "type": "textValue"
+            }
+          ],
+          "type": "thenElse"
+        },
+        {
+          "value": [
+            {
+              "value": "\nWhere do you work at the moment?",
+              "type": "text"
+            }
+          ],
+          "type": "thenElse"
+        }
+      ],
+      "type": "ifThenElse"
+    },
+    {
+      "value": [
+        {
+          "value": "\n\nJake,\nSoftware Developer\njakelennard911@gmail.com",
+          "type": "text"
+        }
+      ],
+      "type": "textValue"
+    }
+  ],
+  "type": "template"
+}
