@@ -30,13 +30,7 @@ export type Template = {
 
 type TemplateNode = Template | TextValue | If | ThenElse | IfThenElse
 
-export abstract class TemplateMessageGenerator {
-  static generateMessageText(template: string, values: Record<string, string>): string {
-    return ''
-  }
-}
-
-export class TemplateMessageBuilder implements TemplateMessageGenerator {
+export class TemplateMessageBuilder {
   private templateAst: Template
   idCount: number = 0
 
@@ -66,7 +60,8 @@ export class TemplateMessageBuilder implements TemplateMessageGenerator {
             }
           })
           message += resolvedString
-        } else if (node.type === 'ifThenElse') {
+        }
+        if (node.type === 'ifThenElse') {
           const [ifNode, thenNode, elseNode] = node.value
           const resolvedIfString = ifNode.value.replace(/\{.+?\}/g, (match) => {
             const valueKey = match.slice(1, -1)
@@ -98,11 +93,9 @@ export class TemplateMessageBuilder implements TemplateMessageGenerator {
     const templateAst = this.getTemplateAst()
     const removeId = (templateNodes: Array<TextValue | IfThenElse>) => {
       for (let node of templateNodes) {
-        if (node.type === 'textValue') {
-          delete node.id
-        } else if (node.type === 'ifThenElse') {
+        delete node.id
+        if (node.type === 'ifThenElse') {
           const [ifNode, thenNode, elseNode] = node.value
-          delete node.id
           delete ifNode.id
           delete thenNode.id
           delete elseNode.id

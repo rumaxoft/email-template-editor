@@ -186,6 +186,21 @@ describe('update textValue', () => {
     expect(tmb.getTemplateAst()).toEqual(expectedResult)
   })
 
+  test('update nonexistent', () => {
+    tmb.updateTextValue('will not commit', 2)
+    const expectedResult = {
+      value: [
+        {
+          value: 'Hi, John!',
+          type: 'textValue',
+          id: 0,
+        },
+      ],
+      type: 'template',
+    }
+    expect(tmb.getTemplateAst()).toEqual(expectedResult)
+  })
+
   test('removes all', () => {
     tmb.updateTextValue('', 0)
     const expectedResult = {
@@ -207,6 +222,130 @@ describe('test add/remove inThenElse', () => {
   test('add ifThenElse', () => {
     tmb.updateTextValue('Hello, Bill!\nBest regards,', 0)
     tmb.addIfThenElse(0, 12)
+    const expectedResult = {
+      value: [
+        {
+          value: 'Hello, Bill!',
+          type: 'textValue',
+          id: 1,
+        },
+        {
+          value: [
+            {
+              value: '',
+              type: 'if',
+              id: 2,
+            },
+            {
+              value: [
+                {
+                  value: '',
+                  type: 'textValue',
+                  id: 3,
+                },
+              ],
+              type: 'thenElse',
+              id: 4,
+            },
+            {
+              value: [
+                {
+                  value: '',
+                  type: 'textValue',
+                  id: 5,
+                },
+              ],
+              type: 'thenElse',
+              id: 6,
+            },
+          ],
+          type: 'ifThenElse',
+          id: 7,
+        },
+        {
+          value: '\nBest regards,',
+          type: 'textValue',
+          id: 8,
+        },
+      ],
+      type: 'template',
+    }
+    expect(tmb.getTemplateAst()).toEqual(expectedResult)
+  })
+
+  test('add ifThenElse wrong parent', () => {
+    const tmb = new TemplateMessageBuilder()
+    const mockedTemplateAst = {
+      value: [
+        {
+          value: '',
+          type: 'textValue',
+          id: 0,
+        },
+      ],
+      type: 'template-wrong',
+    }
+    //@ts-ignore
+    tmb.templateAst = mockedTemplateAst
+    tmb.addIfThenElse(0, 0)
+    expect(tmb.getTemplateAst()).toEqual(mockedTemplateAst)
+  })
+
+  test('add ifThenElse to the wrong node', () => {
+    tmb.addIfThenElse(2, 12)
+    const expectedResult = {
+      value: [
+        {
+          value: 'Hello, Bill!',
+          type: 'textValue',
+          id: 1,
+        },
+        {
+          value: [
+            {
+              value: '',
+              type: 'if',
+              id: 2,
+            },
+            {
+              value: [
+                {
+                  value: '',
+                  type: 'textValue',
+                  id: 3,
+                },
+              ],
+              type: 'thenElse',
+              id: 4,
+            },
+            {
+              value: [
+                {
+                  value: '',
+                  type: 'textValue',
+                  id: 5,
+                },
+              ],
+              type: 'thenElse',
+              id: 6,
+            },
+          ],
+          type: 'ifThenElse',
+          id: 7,
+        },
+        {
+          value: '\nBest regards,',
+          type: 'textValue',
+          id: 8,
+        },
+      ],
+      type: 'template',
+    }
+    expect(tmb.getTemplateAst()).toEqual(expectedResult)
+  })
+
+  test('remove nonexistent ifThenElse', () => {
+    tmb.removeIfThenElse(70)
     const expectedResult = {
       value: [
         {
@@ -392,6 +531,57 @@ describe('test add/remove inThenElse', () => {
       type: 'template',
     }
     expect(tmb.getTemplateAst()).toEqual(expectedResult)
+    tmb.addIfThenElse(12, 0)
+    tmb.removeIfThenElse(20)
+    const expectedResult2 = {
+      value: [
+        {
+          value: 'Hello, Bill!',
+          type: 'textValue',
+          id: 0,
+        },
+        {
+          value: [
+            {
+              value: '',
+              type: 'if',
+              id: 8,
+            },
+            {
+              value: [
+                {
+                  value: '',
+                  type: 'textValue',
+                  id: 11,
+                },
+              ],
+              type: 'thenElse',
+              id: 9,
+            },
+            {
+              value: [
+                {
+                  value: '',
+                  type: 'textValue',
+                  id: 22,
+                },
+              ],
+              type: 'thenElse',
+              id: 10,
+            },
+          ],
+          type: 'ifThenElse',
+          id: 7,
+        },
+        {
+          value: '\nBest regards,',
+          type: 'textValue',
+          id: 13,
+        },
+      ],
+      type: 'template',
+    }
+    expect(tmb.getTemplateAst()).toEqual(expectedResult2)
   })
 })
 
