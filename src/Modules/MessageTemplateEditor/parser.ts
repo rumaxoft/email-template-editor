@@ -1,43 +1,25 @@
-interface TemplateNode {
-  value: string | TemplateNode[]
-  type: string
-  id: number
-}
-
-export interface Value extends TemplateNode {
+export type TextValue = {
   value: string
-  type: 'value'
-  id: number
-}
-
-export interface Text extends TemplateNode {
-  value: string
-  type: 'text'
-  id: number
-}
-
-export interface TextValue extends TemplateNode {
-  value: Array<Text | Value>
   type: 'textValue'
-  id: number
+  id?: number
 }
 
-export interface If extends TemplateNode {
-  value: Array<Text | Value>
+export type If = {
+  value: string
   type: 'if'
-  id: number
+  id?: number
 }
 
-export interface ThenElse extends TemplateNode {
+export type ThenElse = {
   value: Array<TextValue | IfThenElse>
   type: 'thenElse'
-  id: number
+  id?: number
 }
 
-export interface IfThenElse extends TemplateNode {
+export type IfThenElse = {
   value: [TextValue, ThenElse, ThenElse]
   type: 'ifThenElse'
-  id: number
+  id?: number
 }
 
 export type Template = {
@@ -46,7 +28,7 @@ export type Template = {
   id: number
 }
 
-type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>
+type TemplateNode = Template | TextValue | If | ThenElse | IfThenElse
 
 export abstract class TemplateMessageGenerator {
   static generateMessageText(template: string, values: Record<string, string>): string {
@@ -72,40 +54,33 @@ export class TemplateMessageBuilder implements TemplateMessageGenerator {
     const templateAst: Template = JSON.parse(template)
     let message = ''
 
-    const resolveMessage = (templateNodes: TemplateNode[] | string) => {
-      if (!Array.isArray(templateNodes)) return
+    const resolveMessage = (templateNodes: Array<TextValue | IfThenElse>) => {
       for (let node of templateNodes) {
-        if (node.type === 'text') {
-          message += node.value
-        } else if (node.type === 'value') {
-          if (typeof node.value === 'string') {
-            const resolvedValue = values[node.value]
-            if (resolvedValue) {
-              message += resolvedValue
+        if (node.type === 'textValue') {
+          const resolvedString = node.value.replace(/\{.+?\}/g, (match) => {
+            const valueKey = match.slice(1, -1)
+            if (values[valueKey]) {
+              return values[valueKey]
+            } else {
+              return match
             }
-          }
+          })
+          message += resolvedString
         } else if (node.type === 'ifThenElse') {
-          if (!Array.isArray(node.value)) return
           const [ifNode, thenNode, elseNode] = node.value
-          if (!Array.isArray(ifNode.value)) return
-          let resolvedIfNode = ''
-          for (let node of ifNode.value) {
-            if (node.type === 'text') {
-              resolvedIfNode += node.value
-            } else if (node.type === 'value') {
-              if (typeof node.value === 'string') {
-                const value = values[node.value]
-                if (value) {
-                  resolvedIfNode += value
-                }
-              }
+          const resolvedIfString = ifNode.value.replace(/\{.+?\}/g, (match) => {
+            const valueKey = match.slice(1, -1)
+            if (values[valueKey]) {
+              return values[valueKey]
+            } else {
+              return ''
             }
-          }
-          if (resolvedIfNode) {
+          })
+          if (resolvedIfString.length > 0) {
             resolveMessage(thenNode.value)
-          } else resolveMessage(elseNode.value)
-        } else if (node.type === 'textValue') {
-          resolveMessage(node.value)
+          } else {
+            resolveMessage(elseNode.value)
+          }
         }
       }
     }
@@ -121,14 +96,19 @@ export class TemplateMessageBuilder implements TemplateMessageGenerator {
    */
   public generateTemplate(): string {
     const templateAst = this.getTemplateAst()
-    const removeId = (templateNodes: Optional<TemplateNode, 'id'>[] | string) => {
-      if (Array.isArray(templateNodes)) {
-        for (let node of templateNodes) {
+    const removeId = (templateNodes: Array<TextValue | IfThenElse>) => {
+      for (let node of templateNodes) {
+        if (node.type === 'textValue') {
           delete node.id
-          removeId(node.value)
+        } else if (node.type === 'ifThenElse') {
+          const [ifNode, thenNode, elseNode] = node.value
+          delete node.id
+          delete ifNode.id
+          delete thenNode.id
+          delete elseNode.id
+          removeId(thenNode.value)
+          removeId(elseNode.value)
         }
-      } else {
-        return
       }
     }
     removeId(templateAst.value)
@@ -151,23 +131,23 @@ export class TemplateMessageBuilder implements TemplateMessageGenerator {
     const templateAst = JSON.parse(template)
     if (templateAst.value.length === 0) {
       templateAst.value.push({
-        value: [
-          {
-            value: '',
-            type: 'text',
-          },
-        ],
+        value: '',
         type: 'textValue',
       })
     }
-    const addId = (templateNodes: TemplateNode[] | string) => {
-      if (Array.isArray(templateNodes)) {
-        for (let node of templateNodes) {
+    const addId = (templateNodes: Array<TextValue | IfThenElse>) => {
+      for (let node of templateNodes) {
+        if (node.type === 'textValue') {
           node.id = this.idCount++
-          addId(node.value)
+        } else if (node.type === 'ifThenElse') {
+          const [ifNode, thenNode, elseNode] = node.value
+          node.id = this.idCount++
+          ifNode.id = this.idCount++
+          thenNode.id = this.idCount++
+          elseNode.id = this.idCount++
+          addId(thenNode.value)
+          addId(elseNode.value)
         }
-      } else {
-        return
       }
     }
     addId(templateAst.value)
@@ -177,148 +157,52 @@ export class TemplateMessageBuilder implements TemplateMessageGenerator {
   /**
    * finds TemplateNode and it's parent by id
    * @param {number} id id of the TemplateNode
-   * @returns {[TemplateNode | null, TemplateNode | null]}
+   * @returns {[TemplateNode | null, TemplateNode | null]} returns array where [node, parentNode]
    */
   private findById(id: number): [TemplateNode | null, TemplateNode | null] {
     let foundNode: TemplateNode | null = null
     let parentNode: TemplateNode | null = null
-    const find = (templateNodes: Array<TemplateNode> | string, parent: TemplateNode) => {
+    const find = (templateNodes: Array<TextValue | IfThenElse>, parent: TemplateNode) => {
       if (foundNode) return
-      if (Array.isArray(templateNodes)) {
-        for (let node of templateNodes) {
-          if (node.id === id) {
-            if (!foundNode) {
-              foundNode = node
+      for (let node of templateNodes) {
+        if (node.id === id) {
+          foundNode = node
+          parentNode = parent
+        } else {
+          if (node.type === 'ifThenElse') {
+            const [ifNode, thenNode, elseNode] = node.value
+            if (ifNode.id === id) {
+              foundNode = ifNode
+              parentNode = node
             }
-            if (!parentNode) {
-              parentNode = parent
+            if (thenNode.id === id) {
+              foundNode = thenNode
+              parentNode = node
             }
-          } else {
-            find(node.value, node)
+            if (elseNode.id === id) {
+              foundNode = elseNode
+              parentNode = node
+            }
+            find(thenNode.value, thenNode)
+            find(elseNode.value, elseNode)
           }
         }
-      } else {
-        return
       }
     }
     find(this.templateAst.value, this.templateAst)
     return [foundNode, parentNode]
   }
 
-  // // TO-DO: make search logN (if need)
-  // private findNodeUnderCursor(templateNodes: Array<TemplateNode>, index: number): TemplateNode | null {
-  //   let node: TemplateNode | null = null
-  //   let length = 0
-  //   templateNodes.forEach((el) => {
-  //     if (index < length) {
-  //       length += el.value.length
-  //     } else {
-  //       node = el
-  //     }
-  //   })
-  //   return node
-  // }
-
   /**
    * adds text to the Text node
-   * @param {string} value text value
-   * @param {number} id id of the Text node
-   * @param {number} cursorIndex index under cursor in the Text node
+   * @param {string} value text
+   * @param {number} id id of the TextValue node
    * @returns {TemplateMessageBuilder} instance of the TemplateMessageBuilder for method chaining
    */
-  public addText(value: string, id: number, cursorIndex: number): TemplateMessageBuilder {
-    const [node, parent] = this.findById(id)
-    if (!node || !parent) return this
-    if (cursorIndex < 0 || cursorIndex > node.value.length) return this
-    if (node && typeof node === 'object' && node.type === 'text') {
-      node.value = node.value.slice(0, cursorIndex) + value + node.value.slice(cursorIndex)
-    }
-    return this
-  }
-
-  /**
-   * removes text from the Text node
-   * @param {number} length length of the removing text
-   * @param {number} id id of the Text node
-   * @param {number} startIndex index under cursor in the Text node
-   * @returns {TemplateMessageBuilder} instance of the TemplateMessageBuilder for method chaining
-   */
-  public removeText(length: number, id: number, startIndex: number): TemplateMessageBuilder {
-    const [node, parent] = this.findById(id)
-    if (!node || !parent) return this
-    if (node && typeof node === 'object' && typeof node.value === 'string' && node.type === 'text') {
-      node.value = node.value.slice(0, startIndex) + node.value.slice(startIndex + length)
-    }
-    return this
-  }
-
-  /**
-   * Adds Value node to TextValue node
-   * @param {string} value - string value, represents variable.
-   * @param {number} id - id of Text node.
-   * @param {number} cursorIndex - index under cursor in the Text node.
-   * @returns {TemplateMessageBuilder} instance of the TemplateMessageBuilder for method chaining
-   */
-  public addValue(value: string, id: number, cursorIndex: number): TemplateMessageBuilder {
-    const [node, parentNode] = this.findById(id)
-    if (!node || !parentNode) return this
-    if (node && typeof node === 'object' && node.type === 'text') {
-      const leftNode = {
-        value: node.value.slice(0, cursorIndex),
-        type: 'text',
-        id: this.idCount++,
-      }
-      const valueNode = {
-        value,
-        type: 'value',
-        id: this.idCount++,
-      }
-      const rightNode = {
-        value: node.value.slice(cursorIndex),
-        type: 'text',
-        id: this.idCount++,
-      }
-      if (parentNode && Array.isArray(parentNode.value)) {
-        const nodeIndex = parentNode.value.indexOf(node)
-        parentNode.value.splice(nodeIndex, 1, leftNode, valueNode, rightNode)
-      }
-    }
-    return this
-  }
-
-  /**
-   * removes Value node from TextValue node
-   * @param {number} id id of the Value node
-   * @returns {TemplateMessageBuilder} instance of the TemplateMessageBuilder for method chaining
-   */
-  public removeValue(id: number): TemplateMessageBuilder {
-    const [node, parentNode] = this.findById(id)
-    if (!node || !parentNode) return this
-    if (node && typeof node === 'object' && node.type === 'value') {
-      if (Array.isArray(parentNode.value)) {
-        const nodeIndex = parentNode.value.indexOf(node)
-        const prevNode = parentNode.value[nodeIndex - 1]
-        const nextNode = parentNode.value[nodeIndex + 1]
-        if (
-          prevNode &&
-          typeof prevNode === 'object' &&
-          prevNode.type === 'text' &&
-          typeof prevNode.value === 'string' &&
-          nextNode &&
-          typeof nextNode === 'object' &&
-          nextNode.type === 'text' &&
-          typeof nextNode.value === 'string'
-        ) {
-          const concatenated = {
-            value: prevNode.value + nextNode.value,
-            type: 'text',
-            id: this.idCount++,
-          }
-          parentNode.value.splice(nodeIndex - 1, 3, concatenated)
-        } else {
-          parentNode.value.splice(nodeIndex, 1)
-        }
-      }
+  public updateTextValue(value: string, id: number): TemplateMessageBuilder {
+    const [node] = this.findById(id)
+    if (node && node.type === 'textValue') {
+      node.value = value
     }
     return this
   }
@@ -326,42 +210,28 @@ export class TemplateMessageBuilder implements TemplateMessageGenerator {
   /**
    * adds IfThenElse node to TextValue node
    * @param {number} id - id of Text node.
-   * @param {number} cursorIndex - index under cursor in the Text node.
+   * @param {number} cursorIndex - index under cursor in the TextValue node.
    * @returns {TemplateMessageBuilder} instance of the TemplateMessageBuilder for method chaining
    */
   public addIfThenElse(id: number, cursorIndex: number): TemplateMessageBuilder {
     const [node, parentNode] = this.findById(id)
-    if (!node || !parentNode) return this
-    const [, grandParentNode] = this.findById(parentNode.id)
-    if (node && typeof node === 'object' && node.type === 'text') {
+    if (node && node.type === 'textValue') {
       const leftNode = {
         value: node.value.slice(0, cursorIndex),
-        type: 'text',
+        type: 'textValue',
         id: this.idCount++,
-      }
+      } as TextValue
       const ifThenElseNode = {
         value: [
           {
-            value: [
-              {
-                value: '',
-                type: 'text',
-                id: this.idCount++,
-              },
-            ],
+            value: '',
             type: 'if',
             id: this.idCount++,
           },
           {
             value: [
               {
-                value: [
-                  {
-                    value: '',
-                    type: 'text',
-                    id: this.idCount++,
-                  },
-                ],
+                value: '',
                 type: 'textValue',
                 id: this.idCount++,
               },
@@ -372,13 +242,7 @@ export class TemplateMessageBuilder implements TemplateMessageGenerator {
           {
             value: [
               {
-                value: [
-                  {
-                    value: '',
-                    type: 'text',
-                    id: this.idCount++,
-                  },
-                ],
+                value: '',
                 type: 'textValue',
                 id: this.idCount++,
               },
@@ -389,29 +253,16 @@ export class TemplateMessageBuilder implements TemplateMessageGenerator {
         ],
         type: 'ifThenElse',
         id: this.idCount++,
-      }
+      } as unknown as IfThenElse
       const rightNode = {
         value: node.value.slice(cursorIndex),
-        type: 'text',
+        type: 'textValue',
         id: this.idCount++,
-      }
+      } as TextValue
 
-      if (parentNode && Array.isArray(parentNode.value)) {
+      if (parentNode && (parentNode.type === 'template' || parentNode.type === 'thenElse')) {
         const nodeIndex = parentNode.value.indexOf(node)
-        const leftTextValue = {
-          value: [...parentNode.value.slice(0, nodeIndex), leftNode],
-          type: 'textValue',
-          id: this.idCount++,
-        }
-        const rightTextValue = {
-          value: [rightNode, ...parentNode.value.slice(nodeIndex + 1)],
-          type: 'textValue',
-          id: this.idCount++,
-        }
-        if (grandParentNode && Array.isArray(grandParentNode.value)) {
-          const parentNodeIndex = grandParentNode.value.indexOf(parentNode)
-          grandParentNode.value.splice(parentNodeIndex, 1, leftTextValue, ifThenElseNode, rightTextValue)
-        }
+        parentNode.value.splice(nodeIndex, 1, leftNode, ifThenElseNode, rightNode)
       }
     }
     return this
@@ -424,53 +275,25 @@ export class TemplateMessageBuilder implements TemplateMessageGenerator {
    */
   public removeIfThenElse(id: number): TemplateMessageBuilder {
     const [node, parentNode] = this.findById(id)
-    if (!node || !parentNode) return this
-    if (typeof node !== 'object' || node.type !== 'ifThenElse') return this
-    if (!Array.isArray(parentNode.value)) return this
-    const nodeIndex = parentNode.value.indexOf(node)
-    const prevNode = parentNode.value[nodeIndex - 1]
-    const nextNode = parentNode.value[nodeIndex + 1]
     if (
-      prevNode &&
-      typeof prevNode === 'object' &&
-      prevNode.type === 'textValue' &&
-      Array.isArray(prevNode.value) &&
-      nextNode &&
-      typeof nextNode === 'object' &&
-      nextNode.type === 'textValue' &&
-      Array.isArray(nextNode.value)
+      node &&
+      parentNode &&
+      (parentNode.type === 'template' || parentNode.type === 'thenElse') &&
+      node.type === 'ifThenElse'
     ) {
-      const prevNodeInnerLast = prevNode.value[prevNode.value.length - 1]
-      const nextNodeInnerFirst = nextNode.value[0]
-      if (
-        typeof prevNodeInnerLast === 'object' &&
-        prevNodeInnerLast.type === 'text' &&
-        typeof prevNodeInnerLast.value === 'string' &&
-        typeof nextNodeInnerFirst === 'object' &&
-        nextNodeInnerFirst.type === 'text' &&
-        typeof nextNodeInnerFirst.value === 'string'
-      ) {
-        const innerConcatenated = {
-          value: prevNodeInnerLast.value + nextNodeInnerFirst.value,
-          type: 'text',
-          id: this.idCount++,
-        }
+      const nodeIndex = parentNode.value.indexOf(node)
+      const prevNode = parentNode.value[nodeIndex - 1]
+      const nextNode = parentNode.value[nodeIndex + 1]
+      if (prevNode && prevNode.type === 'textValue' && nextNode.type === 'textValue') {
         const concatenated = {
-          value: [...prevNode.value.slice(0, -1), innerConcatenated, ...nextNode.value.slice(1)],
+          value: prevNode.value + nextNode.value,
           type: 'textValue',
           id: this.idCount++,
-        }
+        } as TextValue
         parentNode.value.splice(nodeIndex - 1, 3, concatenated)
       } else {
-        const concatenated = {
-          value: [...prevNode.value, ...nextNode.value],
-          type: 'textValue',
-          id: this.idCount++,
-        }
-        parentNode.value.splice(nodeIndex - 1, 3, concatenated)
+        parentNode.value.splice(nodeIndex, 1)
       }
-    } else {
-      parentNode.value.splice(nodeIndex, 1)
     }
     return this
   }

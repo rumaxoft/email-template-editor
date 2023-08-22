@@ -8,13 +8,7 @@ describe('create instance of TemplateMessageBuilder and test private parse funct
     const expectedResult = {
       value: [
         {
-          value: [
-            {
-              value: '',
-              type: 'text',
-              id: 1,
-            },
-          ],
+          value: '',
           type: 'textValue',
           id: 0,
         },
@@ -28,21 +22,25 @@ describe('create instance of TemplateMessageBuilder and test private parse funct
     const templateFixture = {
       value: [
         {
+          value: 'Hello, {firstname}!',
+          type: 'textValue',
+        },
+        {
           value: [
             {
-              value: 'Hello, ',
-              type: 'text',
+              value: 'if text',
+              type: 'if',
             },
             {
-              value: 'firstname',
-              type: 'value',
+              value: 'thenElse text',
+              type: 'thenElse',
             },
             {
-              value: '!',
-              type: 'text',
+              value: 'thenElse text',
+              type: 'thenElse',
             },
           ],
-          type: 'textValue',
+          type: 'ifThenElse',
         },
       ],
       type: 'template',
@@ -50,25 +48,30 @@ describe('create instance of TemplateMessageBuilder and test private parse funct
     const expectedResult = {
       value: [
         {
+          value: 'Hello, {firstname}!',
+          type: 'textValue',
+          id: 0,
+        },
+        {
           value: [
             {
-              value: 'Hello, ',
-              type: 'text',
-              id: 1,
-            },
-            {
-              value: 'firstname',
-              type: 'value',
+              value: 'if text',
+              type: 'if',
               id: 2,
             },
             {
-              value: '!',
-              type: 'text',
+              value: 'thenElse text',
+              type: 'thenElse',
               id: 3,
             },
+            {
+              value: 'thenElse text',
+              type: 'thenElse',
+              id: 4,
+            },
           ],
-          type: 'textValue',
-          id: 0,
+          type: 'ifThenElse',
+          id: 1,
         },
       ],
       type: 'template',
@@ -79,21 +82,86 @@ describe('create instance of TemplateMessageBuilder and test private parse funct
   })
 })
 
-describe('testing add/remove text', () => {
+describe('findById', () => {
+  test('findById if  thenNode elseNode', () => {
+    const templateFixture = {
+      value: [
+        {
+          value: 'Hello, {firstname}!',
+          type: 'textValue',
+        },
+        {
+          value: [
+            {
+              value: 'if text',
+              type: 'if',
+            },
+            {
+              value: 'thenElse text',
+              type: 'thenElse',
+            },
+            {
+              value: 'thenElse text',
+              type: 'thenElse',
+            },
+          ],
+          type: 'ifThenElse',
+        },
+      ],
+      type: 'template',
+    }
+    const tmb = new TemplateMessageBuilder(JSON.stringify(templateFixture))
+    const [ifNode, parent] = tmb['findById'](2)
+    const [thenNode] = tmb['findById'](3)
+    const [elseNode] = tmb['findById'](4)
+    expect(ifNode).toEqual({
+      value: 'if text',
+      type: 'if',
+      id: 2,
+    })
+    expect(thenNode).toEqual({
+      value: 'thenElse text',
+      type: 'thenElse',
+      id: 3,
+    })
+    expect(elseNode).toEqual({
+      value: 'thenElse text',
+      type: 'thenElse',
+      id: 4,
+    })
+    expect(parent).toEqual({
+      value: [
+        {
+          value: 'if text',
+          type: 'if',
+          id: 2,
+        },
+        {
+          value: 'thenElse text',
+          type: 'thenElse',
+          id: 3,
+        },
+        {
+          value: 'thenElse text',
+          type: 'thenElse',
+          id: 4,
+        },
+      ],
+      type: 'ifThenElse',
+      id: 1,
+    })
+  })
+})
+
+describe('update textValue', () => {
   const tmb = new TemplateMessageBuilder()
 
-  test('adds word', () => {
-    tmb.addText('Hllo', 1, 0)
+  test('update empty', () => {
+    tmb.updateTextValue('Hello, Bill!', 0)
     const expectedResult = {
       value: [
         {
-          value: [
-            {
-              value: 'Hllo',
-              type: 'text',
-              id: 1,
-            },
-          ],
+          value: 'Hello, Bill!',
           type: 'textValue',
           id: 0,
         },
@@ -103,18 +171,12 @@ describe('testing add/remove text', () => {
     expect(tmb.getTemplateAst()).toEqual(expectedResult)
   })
 
-  test('adds char at index', () => {
-    tmb.addText('e', 1, 1)
+  test('update not empty', () => {
+    tmb.updateTextValue('Hi, John!', 0)
     const expectedResult = {
       value: [
         {
-          value: [
-            {
-              value: 'Hello',
-              type: 'text',
-              id: 1,
-            },
-          ],
+          value: 'Hi, John!',
           type: 'textValue',
           id: 0,
         },
@@ -124,38 +186,12 @@ describe('testing add/remove text', () => {
     expect(tmb.getTemplateAst()).toEqual(expectedResult)
   })
 
-  test('removes characters', () => {
-    tmb.removeText(3, 1, 0)
-    const expectedResult = {
-      value: [
-        {
-          value: [
-            {
-              value: 'lo',
-              type: 'text',
-              id: 1,
-            },
-          ],
-          type: 'textValue',
-          id: 0,
-        },
-      ],
-      type: 'template',
-    }
-    expect(tmb.getTemplateAst()).toEqual(expectedResult)
-  })
   test('removes all', () => {
-    tmb.removeText(999, 1, 0)
+    tmb.updateTextValue('', 0)
     const expectedResult = {
       value: [
         {
-          value: [
-            {
-              value: '',
-              type: 'text',
-              id: 1,
-            },
-          ],
+          value: '',
           type: 'textValue',
           id: 0,
         },
@@ -166,265 +202,70 @@ describe('testing add/remove text', () => {
   })
 })
 
-describe('testing add/remove value', () => {
-  const tmb = new TemplateMessageBuilder()
-
-  test('add value', () => {
-    tmb.addText('Hello, ', 1, 0)
-    tmb.addValue('firstname', 1, 7)
-    const expectedResult = {
-      value: [
-        {
-          value: [
-            {
-              value: 'Hello, ',
-              type: 'text',
-              id: 2,
-            },
-            {
-              value: 'firstname',
-              type: 'value',
-              id: 3,
-            },
-            {
-              value: '',
-              type: 'text',
-              id: 4,
-            },
-          ],
-          type: 'textValue',
-          id: 0,
-        },
-      ],
-      type: 'template',
-    }
-    expect(tmb.getTemplateAst()).toEqual(expectedResult)
-  })
-
-  test('add value to empty text block', () => {
-    tmb.addValue('secondname', 4, 0)
-    const expectedResult = {
-      value: [
-        {
-          value: [
-            {
-              value: 'Hello, ',
-              type: 'text',
-              id: 2,
-            },
-            {
-              value: 'firstname',
-              type: 'value',
-              id: 3,
-            },
-            {
-              value: '',
-              type: 'text',
-              id: 5,
-            },
-            {
-              value: 'secondname',
-              type: 'value',
-              id: 6,
-            },
-            {
-              value: '',
-              type: 'text',
-              id: 7,
-            },
-          ],
-          type: 'textValue',
-          id: 0,
-        },
-      ],
-      type: 'template',
-    }
-    expect(tmb.getTemplateAst()).toEqual(expectedResult)
-  })
-
-  test('remove value', () => {
-    tmb.addValue('secondname', 4, 0)
-    tmb.removeValue(6)
-    const expectedResult = {
-      value: [
-        {
-          value: [
-            {
-              value: 'Hello, ',
-              type: 'text',
-              id: 2,
-            },
-            {
-              value: 'firstname',
-              type: 'value',
-              id: 3,
-            },
-            {
-              value: '',
-              type: 'text',
-              id: 8,
-            },
-          ],
-          type: 'textValue',
-          id: 0,
-        },
-      ],
-      type: 'template',
-    }
-    expect(tmb.getTemplateAst()).toEqual(expectedResult)
-  })
-
-  test('remove value without concatenation', () => {
-    const template = {
-      value: [
-        {
-          value: [
-            {
-              value: 'Hello, ',
-              type: 'text',
-            },
-            {
-              value: 'firstname',
-              type: 'value',
-            },
-            {
-              value: 'secondname',
-              type: 'value',
-            },
-          ],
-          type: 'textValue',
-        },
-      ],
-      type: 'template',
-    }
-    const tmb = new TemplateMessageBuilder(JSON.stringify(template))
-    tmb.removeValue(2)
-    const expectedResult = {
-      value: [
-        {
-          value: [
-            {
-              value: 'Hello, ',
-              type: 'text',
-              id: 1,
-            },
-            {
-              value: 'secondname',
-              type: 'value',
-              id: 3,
-            },
-          ],
-          type: 'textValue',
-          id: 0,
-        },
-      ],
-      type: 'template',
-    }
-    expect(tmb.getTemplateAst()).toEqual(expectedResult)
-  })
-})
-
-describe('testing add/remove inThenElse', () => {
+describe('test add/remove inThenElse', () => {
   const tmb = new TemplateMessageBuilder()
   test('add ifThenElse', () => {
-    tmb.addText('Hello, Bill!\nBest regards,', 1, 0)
-    tmb.addIfThenElse(1, 12)
+    tmb.updateTextValue('Hello, Bill!\nBest regards,', 0)
+    tmb.addIfThenElse(0, 12)
     const expectedResult = {
       value: [
         {
-          value: [
-            {
-              value: 'Hello, Bill!',
-              type: 'text',
-              id: 2,
-            },
-          ],
+          value: 'Hello, Bill!',
           type: 'textValue',
-          id: 13,
+          id: 1,
         },
         {
           value: [
+            {
+              value: '',
+              type: 'if',
+              id: 2,
+            },
             {
               value: [
                 {
                   value: '',
-                  type: 'text',
+                  type: 'textValue',
                   id: 3,
                 },
               ],
-              type: 'if',
+              type: 'thenElse',
               id: 4,
             },
             {
               value: [
                 {
-                  value: [
-                    {
-                      value: '',
-                      type: 'text',
-                      id: 5,
-                    },
-                  ],
+                  value: '',
                   type: 'textValue',
-                  id: 6,
+                  id: 5,
                 },
               ],
               type: 'thenElse',
-              id: 7,
-            },
-            {
-              value: [
-                {
-                  value: [
-                    {
-                      value: '',
-                      type: 'text',
-                      id: 8,
-                    },
-                  ],
-                  type: 'textValue',
-                  id: 9,
-                },
-              ],
-              type: 'thenElse',
-              id: 10,
+              id: 6,
             },
           ],
           type: 'ifThenElse',
-          id: 11,
+          id: 7,
         },
         {
-          value: [
-            {
-              value: '\nBest regards,',
-              type: 'text',
-              id: 12,
-            },
-          ],
+          value: '\nBest regards,',
           type: 'textValue',
-          id: 14,
+          id: 8,
         },
       ],
       type: 'template',
     }
-    // console.log(JSON.stringify(tmb.getTemplateAst(), null, 2))
     expect(tmb.getTemplateAst()).toEqual(expectedResult)
   })
 
   test('remove ifThenElse', () => {
-    tmb.removeIfThenElse(11)
+    tmb.removeIfThenElse(7)
     const expectedResult = {
       value: [
         {
-          value: [
-            {
-              value: 'Hello, Bill!\nBest regards,',
-              type: 'text',
-              id: 15,
-            },
-          ],
+          value: 'Hello, Bill!\nBest regards,',
           type: 'textValue',
-          id: 16,
+          id: 9,
         },
       ],
       type: 'template',
@@ -436,34 +277,19 @@ describe('testing add/remove inThenElse', () => {
     const template = {
       value: [
         {
-          value: [
-            {
-              value: 'Hello, Bill!',
-              type: 'text',
-            },
-          ],
+          value: 'Hello, Bill!',
           type: 'textValue',
         },
         {
           value: [
             {
-              value: [
-                {
-                  value: '',
-                  type: 'text',
-                },
-              ],
+              value: '',
               type: 'if',
             },
             {
               value: [
                 {
-                  value: [
-                    {
-                      value: '',
-                      type: 'text',
-                    },
-                  ],
+                  value: '',
                   type: 'textValue',
                 },
               ],
@@ -472,12 +298,7 @@ describe('testing add/remove inThenElse', () => {
             {
               value: [
                 {
-                  value: [
-                    {
-                      value: '',
-                      type: 'text',
-                    },
-                  ],
+                  value: '',
                   type: 'textValue',
                 },
               ],
@@ -486,118 +307,84 @@ describe('testing add/remove inThenElse', () => {
           ],
           type: 'ifThenElse',
         },
-      ],
-      type: 'template',
-    }
-
-    const tmb = new TemplateMessageBuilder(JSON.stringify(template))
-    tmb.removeIfThenElse(2)
-
-    const expectedResult = {
-      value: [
         {
           value: [
             {
-              value: 'Hello, Bill!',
-              type: 'text',
-              id: 1,
+              value: '',
+              type: 'if',
+            },
+            {
+              value: [
+                {
+                  value: '',
+                  type: 'textValue',
+                },
+              ],
+              type: 'thenElse',
+            },
+            {
+              value: [
+                {
+                  value: '',
+                  type: 'textValue',
+                },
+              ],
+              type: 'thenElse',
             },
           ],
+          type: 'ifThenElse',
+        },
+        {
+          value: '\nBest regards,',
+          type: 'textValue',
+        },
+      ],
+      type: 'template',
+    }
+    const tmb = new TemplateMessageBuilder(JSON.stringify(template))
+    tmb.removeIfThenElse(1)
+    const expectedResult = {
+      value: [
+        {
+          value: 'Hello, Bill!',
           type: 'textValue',
           id: 0,
         },
-      ],
-      type: 'template',
-    }
-    expect(tmb.getTemplateAst()).toEqual(expectedResult)
-  })
-
-  test('remove ifThenElse without inner concatenation', () => {
-    const template = {
-      value: [
         {
           value: [
             {
-              value: 'Hello, Bill!',
-              type: 'text',
+              value: '',
+              type: 'if',
+              id: 8,
             },
-          ],
-          type: 'textValue',
-        },
-        {
-          value: [
             {
               value: [
                 {
                   value: '',
-                  type: 'text',
+                  type: 'textValue',
+                  id: 11,
                 },
               ],
-              type: 'if',
+              type: 'thenElse',
+              id: 9,
             },
             {
               value: [
                 {
-                  value: [
-                    {
-                      value: '',
-                      type: 'text',
-                    },
-                  ],
+                  value: '',
                   type: 'textValue',
+                  id: 12,
                 },
               ],
               type: 'thenElse',
-            },
-            {
-              value: [
-                {
-                  value: [
-                    {
-                      value: '',
-                      type: 'text',
-                    },
-                  ],
-                  type: 'textValue',
-                },
-              ],
-              type: 'thenElse',
+              id: 10,
             },
           ],
           type: 'ifThenElse',
+          id: 7,
         },
         {
-          value: [
-            {
-              value: 'secondname',
-              type: 'value',
-            },
-          ],
-          type: 'textValue',
-        },
-      ],
-      type: 'template',
-    }
-
-    const tmb = new TemplateMessageBuilder(JSON.stringify(template))
-    tmb.removeIfThenElse(2)
-    // console.log(JSON.stringify(tmb.getTemplateAst(), null, 2))
-
-    const expectedResult = {
-      value: [
-        {
-          value: [
-            {
-              value: 'Hello, Bill!',
-              type: 'text',
-              id: 1,
-            },
-            {
-              value: 'secondname',
-              type: 'value',
-              id: 12,
-            },
-          ],
+          value: '\nBest regards,',
           type: 'textValue',
           id: 13,
         },
@@ -617,7 +404,7 @@ describe('test generateMessageText', () => {
       company: 'Bill & Melinda Gates Foundation',
       position: 'Co-chair',
     })
-    const expectedResult = `Hello, Bill!
+    const expectedResult = `Hello, Bill Gates!
 
 I just went through your profile and I would love to join your network!
 I know you work at Bill & Melinda Gates Foundation as Co-chair.;)
@@ -637,7 +424,7 @@ jakelennard911@gmail.com`
       company: 'Bill & Melinda Gates Foundation',
       position: 'Co-chair',
     })
-    const expectedResult = `Hello, Bill!
+    const expectedResult = `Hello, Bill Gates!
 
 I just went through your profile and I would love to join your network!
 I know you work at Bill & Melinda Gates Foundation as Co-chair.;)
@@ -654,7 +441,7 @@ jakelennard911@gmail.com`
       lastname: 'Gates',
       company: 'Bill & Melinda Gates Foundation',
     })
-    const expectedResult = `Hello, Bill!
+    const expectedResult = `Hello, Bill Gates!
 
 I just went through your profile and I would love to join your network!
 I know you work at Bill & Melinda Gates Foundation, but what is your role?;)
@@ -670,7 +457,22 @@ jakelennard911@gmail.com`
       firstname: 'Bill',
       lastname: 'Gates',
     })
-    const expectedResult = `Hello, Bill!
+    const expectedResult = `Hello, Bill Gates!
+
+I just went through your profile and I would love to join your network!
+Where do you work at the moment?
+
+Jake,
+Software Developer
+jakelennard911@gmail.com`
+    expect(message).toBe(expectedResult)
+  })
+
+  test('generate message text with one variables undefined', () => {
+    const message = TemplateMessageBuilder.generateMessageText(templateString, {
+      firstname: 'Bill',
+    })
+    const expectedResult = `Hello, Bill {lastname}!
 
 I just went through your profile and I would love to join your network!
 Where do you work at the moment?
@@ -685,38 +487,19 @@ jakelennard911@gmail.com`
     const template = {
       value: [
         {
-          value: [
-            {
-              value: 'Hello, Bill!\n',
-              type: 'text',
-            },
-          ],
+          value: 'Hello, Bill!\n',
           type: 'textValue',
         },
         {
           value: [
             {
-              value: [
-                {
-                  value: 'surname',
-                  type: 'value',
-                },
-                {
-                  value: 'true',
-                  type: 'text',
-                },
-              ],
+              value: 'true',
               type: 'if',
             },
             {
               value: [
                 {
-                  value: [
-                    {
-                      value: 'This text should be shown.',
-                      type: 'text',
-                    },
-                  ],
+                  value: 'This text should be shown.',
                   type: 'textValue',
                 },
               ],
@@ -725,12 +508,7 @@ jakelennard911@gmail.com`
             {
               value: [
                 {
-                  value: [
-                    {
-                      value: 'This text should not be shown.',
-                      type: 'text',
-                    },
-                  ],
+                  value: 'This text should not be shown.',
                   type: 'textValue',
                 },
               ],
@@ -740,12 +518,55 @@ jakelennard911@gmail.com`
           type: 'ifThenElse',
         },
         {
+          value: '\nBest regards!',
+          type: 'textValue',
+        },
+      ],
+      type: 'template',
+    }
+    const message = TemplateMessageBuilder.generateMessageText(JSON.stringify(template), {})
+    const expectedResult = `Hello, Bill!
+This text should be shown.
+Best regards!`
+    expect(message).toBe(expectedResult)
+  })
+
+  test('generate message text with no text in ifNode and undefined variable', () => {
+    const template = {
+      value: [
+        {
+          value: 'Hello, Bill!\n',
+          type: 'textValue',
+        },
+        {
           value: [
             {
-              value: '\nBest regards!',
-              type: 'text',
+              value: '',
+              type: 'if',
+            },
+            {
+              value: [
+                {
+                  value: 'This text should not be shown.',
+                  type: 'textValue',
+                },
+              ],
+              type: 'thenElse',
+            },
+            {
+              value: [
+                {
+                  value: 'This text should be shown.',
+                  type: 'textValue',
+                },
+              ],
+              type: 'thenElse',
             },
           ],
+          type: 'ifThenElse',
+        },
+        {
+          value: '\nBest regards!',
           type: 'textValue',
         },
       ],
