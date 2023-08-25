@@ -1,35 +1,4 @@
-export type TextValue = {
-  value: string
-  type: 'textValue'
-  id?: number
-}
-
-export type If = {
-  value: string
-  type: 'if'
-  id?: number
-}
-
-export type ThenElse = {
-  value: Array<TextValue | IfThenElse>
-  type: 'thenElse'
-  id?: number
-}
-
-export type IfThenElse = {
-  value: [TextValue, ThenElse, ThenElse]
-  type: 'ifThenElse'
-  id?: number
-}
-
-export type Template = {
-  value: Array<TextValue | IfThenElse>
-  type: 'template'
-  id: number
-}
-
-type TemplateNode = Template | TextValue | If | ThenElse | IfThenElse
-
+import type { Template, TextValue, IfThenElse, TemplateNode } from '../../shared/Template'
 export class TemplateMessageBuilder {
   private templateAst: Template
   idCount: number = 0

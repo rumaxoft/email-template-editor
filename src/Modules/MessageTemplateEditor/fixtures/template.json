@@ -8,7 +8,7 @@
       "value": [
         {
           "value": "{company}",
-          "type": "if"
+          "type": "textValue"
         },
         {
           "value": [
@@ -20,7 +20,7 @@
               "value": [
                 {
                   "value": "{position}",
-                  "type": "if"
+                  "type": "textValue"
                 },
                 {
                   "value": [

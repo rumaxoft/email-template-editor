@@ -1,0 +1,62 @@
+.textareaContainer {
+  position: relative;
+}
+
+.textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+  flex-shrink: 1;
+  min-height: 2rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-width: 1px;
+  border-color: hsl(var(--bc) / var(--tw-border-opacity));
+  --tw-border-opacity: 0;
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--b1) / var(--tw-bg-opacity));
+  border-radius: var(--rounded-btn, 0.5rem);
+  resize: vertical;
+}
+
+.textarea:focus {
+  outline-style: solid;
+  outline-width: 2px;
+  outline-offset: 2px;
+  outline-color: hsl(var(--bc) / 0.2);
+}
+
+.textareaBordered {
+  --tw-border-opacity: 0.2;
+}
+
+.textareaShadow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+  flex-shrink: 1;
+  min-height: 2rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: transparent;
+  line-height: 1.5;
+  border-radius: var(--rounded-btn, 0.5rem);
+}
+
+.value {
+  color: white;
+  background-color: green;
+  border-radius: 2px;
+  padding-bottom: 0.2rem;
+  padding-left: 0.3rem;
+  padding-right: 0.3rem;
+  position: relative;
+  left: 0.1rem;
+}
