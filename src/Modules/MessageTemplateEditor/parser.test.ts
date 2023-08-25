@@ -153,6 +153,48 @@ describe('findById', () => {
   })
 })
 
+describe('getTextValue', () => {
+  const templateFixture = {
+    value: [
+      {
+        value: 'Hello, {firstname}!',
+        type: 'textValue',
+      },
+      {
+        value: [
+          {
+            value: 'if text',
+            type: 'if',
+          },
+          {
+            value: 'thenElse text',
+            type: 'thenElse',
+          },
+          {
+            value: 'thenElse text',
+            type: 'thenElse',
+          },
+        ],
+        type: 'ifThenElse',
+      },
+    ],
+    type: 'template',
+  }
+  const tmb = new TemplateMessageBuilder(JSON.stringify(templateFixture))
+  test('getTextValue if node exists', () => {
+    const value = tmb.getTextValue(0)
+    expect(value).toBe('Hello, {firstname}!')
+  })
+  test('getTextValue if node does not exist', () => {
+    const value = tmb.getTextValue(-1)
+    expect(value).toBe(null)
+  })
+  test('getTextValue if node is not textValue type', () => {
+    const value = tmb.getTextValue(3)
+    expect(value).toBe(null)
+  })
+})
+
 describe('update textValue', () => {
   const tmb = new TemplateMessageBuilder()
 

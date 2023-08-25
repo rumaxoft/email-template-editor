@@ -85,6 +85,20 @@ export class TemplateMessageBuilder {
   }
 
   /**
+   * returns value of TextValue node
+   * @param {number} id id of the TextValue node
+   * @returns {string | null} value of TextValue node
+   */
+  public getTextValue(id: number): string | null {
+    const [found] = this.findById(id)
+    if (found && found.type === 'textValue') {
+      return found.value
+    } else {
+      return null
+    }
+  }
+
+  /**
    * parses template string and adds ids to nodes
    * @param {string} template template string
    * @returns {Template}
