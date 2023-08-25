@@ -1,6 +1,6 @@
 import { expectedResult } from './fixtures/expectedTemplate'
 import templateFixture from './fixtures/template.json'
-import { TemplateMessageBuilder } from './parser'
+import { TemplateMessageBuilder } from './TemplateMessageBuilder'
 
 describe('create instance of TemplateMessageBuilder and test private parse function', () => {
   test('creates template when instance created without arguments', () => {
