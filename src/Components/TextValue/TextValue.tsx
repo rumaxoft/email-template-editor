@@ -1,3 +1,5 @@
+import { useEffect, useRef, useMemo } from 'react'
+
 import { generateAst } from './helpers/generateAst'
 import {
   moveCursorLeft,
@@ -26,7 +28,8 @@ const TextValue: React.FC<TextValueProps> = ({
   setActiveTextValueId,
   setCurrentIndex,
 }) => {
-  const resize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const textarea = useRef(null)
+  const resize = (e: React.ChangeEvent<HTMLTextAreaElement> | { target: HTMLTextAreaElement }) => {
     if (e.target) {
       const elem = e.target as HTMLTextAreaElement
       const borders = parseFloat(window.getComputedStyle(elem).borderWidth) * 2
@@ -34,6 +37,11 @@ const TextValue: React.FC<TextValueProps> = ({
       elem.style.height = elem.scrollHeight + borders + 'px'
     }
   }
+  useEffect(() => {
+    if (textarea.current) {
+      resize({ target: textarea.current })
+    }
+  }, [])
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTextValue(e.target.value, id)
     if (resizable) {
@@ -98,6 +106,7 @@ const TextValue: React.FC<TextValueProps> = ({
         onClick={(e) => clickHandler(e)}
         onKeyDown={(e) => keydownHandler(e)}
         onFocus={(e) => handleFocus(e)}
+        ref={textarea}
       ></textarea>
       <div className={`${styles.textareaShadow}`}>
         {generateAst(value, values).map((el, index) => {
