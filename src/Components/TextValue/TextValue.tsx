@@ -14,6 +14,8 @@ export interface TextValueProps {
   setTextValue: (value: string, id: number) => void
   resizable?: boolean
   values?: Record<string, string>
+  activeTextValueId: number
+  currentIndex: number
   setCurrentIndex: (value: number) => void
   setActiveTextValueId: (value: number) => void
   id: number
@@ -25,10 +27,12 @@ const TextValue: React.FC<TextValueProps> = ({
   resizable = false,
   values,
   id,
+  activeTextValueId,
+  currentIndex,
   setActiveTextValueId,
   setCurrentIndex,
 }) => {
-  const textarea = useRef(null)
+  const textarea = useRef<null | HTMLTextAreaElement>(null)
   const resize = (e: React.ChangeEvent<HTMLTextAreaElement> | { target: HTMLTextAreaElement }) => {
     if (e.target) {
       const elem = e.target as HTMLTextAreaElement
@@ -37,11 +41,27 @@ const TextValue: React.FC<TextValueProps> = ({
       elem.style.height = elem.scrollHeight + borders + 'px'
     }
   }
+
+  const generateAstMemoized = useMemo(() => {
+    return generateAst(value, values)
+  }, [value, values])
+
+  useEffect(() => {
+    if (textarea.current) {
+      if (activeTextValueId === id && currentIndex !== textarea.current.selectionStart) {
+        textarea.current.selectionStart = currentIndex
+        textarea.current.selectionEnd = currentIndex
+        textarea.current.focus()
+      }
+    }
+  }, [currentIndex, activeTextValueId, id])
+
   useEffect(() => {
     if (textarea.current) {
       resize({ target: textarea.current })
     }
   }, [])
+
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTextValue(e.target.value, id)
     if (resizable) {
@@ -109,7 +129,7 @@ const TextValue: React.FC<TextValueProps> = ({
         ref={textarea}
       ></textarea>
       <div className={`${styles.textareaShadow}`}>
-        {generateAst(value, values).map((el, index) => {
+        {generateAstMemoized.map((el, index) => {
           return (
             <span
               key={index}
