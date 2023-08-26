@@ -1,0 +1,24 @@
+.ifThenElseContainer {
+  padding: 0.5rem;
+  margin-bottom: 0.2rem;
+  padding-left: 2rem;
+  border: 1px solid magenta;
+}
+
+.ifContainer {
+  margin-bottom: 0.2rem;
+  padding: 0.5rem;
+  border: 1px solid red;
+}
+
+.thenContainer {
+  margin-bottom: 0.2rem;
+  padding: 0.5rem;
+  border: 1px solid green;
+}
+
+.elseContainer {
+  margin-bottom: 0.2rem;
+  padding: 0.5rem;
+  border: 1px solid blue;
+}
