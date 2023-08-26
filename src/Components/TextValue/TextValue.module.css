@@ -50,13 +50,32 @@
   border-radius: var(--rounded-btn, 0.5rem);
 }
 
+.text {
+  white-space: pre-wrap;
+}
+
 .value {
   color: white;
   background-color: green;
-  border-radius: 2px;
   padding-bottom: 0.2rem;
-  padding-left: 0.3rem;
-  padding-right: 0.3rem;
+  white-space: pre-wrap;
   position: relative;
-  left: 0.1rem;
+  left: 0.05rem;
+}
+.valueBracketLeft {
+  color: transparent;
+  background-color: green;
+  border-radius: 0.2rem 0 0 0.2rem;
+  padding-bottom: 0.2rem;
+  white-space: pre-wrap;
+  position: relative;
+  left: 0.12rem;
+}
+
+.valueBracketRight {
+  color: transparent;
+  background-color: green;
+  border-radius: 0 0.2rem 0.2rem 0;
+  padding-bottom: 0.2rem;
+  white-space: pre-wrap;
 }

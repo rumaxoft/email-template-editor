@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from 'react'
+import React, { useEffect, useRef, useMemo } from 'react'
 
 import { generateAst } from './helpers/generateAst'
 import {
@@ -48,9 +48,10 @@ const TextValue: React.FC<TextValueProps> = ({
 
   useEffect(() => {
     if (textarea.current) {
-      if (activeTextValueId === id && currentIndex !== textarea.current.selectionStart) {
+      if (activeTextValueId === id) {
         textarea.current.selectionStart = currentIndex
         textarea.current.selectionEnd = currentIndex
+        resize({ target: textarea.current })
         textarea.current.focus()
       }
     }
@@ -130,15 +131,27 @@ const TextValue: React.FC<TextValueProps> = ({
       ></textarea>
       <div className={`${styles.textareaShadow}`}>
         {generateAstMemoized.map((el, index) => {
-          return (
-            <span
-              key={index}
-              style={{ whiteSpace: 'pre-wrap' }}
-              className={`${el.type === 'value' ? styles.value : ''}`}
-            >
-              {el.type === 'value' ? el.value.slice(1, -1) : el.value}
-            </span>
-          )
+          if (el.type === 'value') {
+            return (
+              <React.Fragment key={index + 'fr'}>
+                <span key={index + 'lb'} className={styles.valueBracketLeft}>
+                  {'{'}
+                </span>
+                <span key={index} className={styles.value}>
+                  {el.value.slice(1, -1)}
+                </span>
+                <span key={index + 'rb'} className={styles.valueBracketRight}>
+                  {'}'}
+                </span>
+              </React.Fragment>
+            )
+          } else {
+            return (
+              <span className={styles.text} key={index}>
+                {el.value}
+              </span>
+            )
+          }
         })}
       </div>
     </div>
