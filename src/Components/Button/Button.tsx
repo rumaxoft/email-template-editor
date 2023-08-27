@@ -7,7 +7,7 @@ export interface ButtonProps {
   text?: string
   children?: React.ReactNode
   style?: React.CSSProperties
-  onClick?: () => void
+  onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
 }
 
 const Button: React.FC<ButtonProps> = ({ text = 'some text', level, lg, sm, xs, children, style, ...rest }) => {
