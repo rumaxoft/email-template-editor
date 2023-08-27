@@ -6,6 +6,7 @@ import { IfThenElse } from '../../shared/Template'
 
 import { Button } from '../Button'
 import { Collapse } from '../Collapse'
+import { Label } from '../Label'
 import { TextValue } from '../TextValue'
 
 export interface IfThenElseProps {
@@ -35,7 +36,7 @@ const IfThenElseFC: React.FC<IfThenElseProps> = ({
       <>
         <div className={`${styles.ifThenElseContainer}`}>
           <div className={`${styles.label}`}>
-            <Button xs>then</Button>
+            <Label xs>then</Label>
           </div>
           <div className={`${styles.thenContainer}`}>
             {thenNode.value.map((el) => {
@@ -76,7 +77,7 @@ const IfThenElseFC: React.FC<IfThenElseProps> = ({
         </div>
         <div className={`${styles.ifThenElseContainer}`}>
           <div className={`${styles.label}`}>
-            <Button xs>else</Button>
+            <Label xs>else</Label>
           </div>
           <div className={`${styles.elseContainer}`}>
             {elseNode.value.map((el) => {
@@ -125,9 +126,9 @@ const IfThenElseFC: React.FC<IfThenElseProps> = ({
           <Button level='error' style={{ marginRight: 'auto' }} xs>
             <RiDeleteBin2Line />
           </Button>
-          <Button level='neutral' xs>
+          <Label level='neutral' xs>
             if
-          </Button>
+          </Label>
         </div>
         <div className={`${styles.ifContainer}`}>
           <TextValue
