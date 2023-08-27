@@ -18,6 +18,21 @@ describe('create instance of TemplateMessageBuilder and test private parse funct
     expect(tmb.getTemplateAst()).toEqual(expectedResult)
   })
 
+  test('creates template when instance created with empty string', () => {
+    const tmb = new TemplateMessageBuilder('')
+    const expectedResult = {
+      value: [
+        {
+          value: '',
+          type: 'textValue',
+          id: 0,
+        },
+      ],
+      type: 'template',
+    }
+    expect(tmb.getTemplateAst()).toEqual(expectedResult)
+  })
+
   test('adds ids', () => {
     const templateFixture = {
       value: [
@@ -29,7 +44,7 @@ describe('create instance of TemplateMessageBuilder and test private parse funct
           value: [
             {
               value: 'if text',
-              type: 'if',
+              type: 'textValue',
             },
             {
               value: 'thenElse text',
@@ -56,7 +71,7 @@ describe('create instance of TemplateMessageBuilder and test private parse funct
           value: [
             {
               value: 'if text',
-              type: 'if',
+              type: 'textValue',
               id: 2,
             },
             {
@@ -94,7 +109,7 @@ describe('findById', () => {
           value: [
             {
               value: 'if text',
-              type: 'if',
+              type: 'textValue',
             },
             {
               value: 'thenElse text',
@@ -116,7 +131,7 @@ describe('findById', () => {
     const [elseNode] = tmb['findById'](4)
     expect(ifNode).toEqual({
       value: 'if text',
-      type: 'if',
+      type: 'textValue',
       id: 2,
     })
     expect(thenNode).toEqual({
@@ -133,7 +148,7 @@ describe('findById', () => {
       value: [
         {
           value: 'if text',
-          type: 'if',
+          type: 'textValue',
           id: 2,
         },
         {
@@ -164,7 +179,7 @@ describe('getTextValue', () => {
         value: [
           {
             value: 'if text',
-            type: 'if',
+            type: 'textValue',
           },
           {
             value: 'thenElse text',
@@ -192,6 +207,127 @@ describe('getTextValue', () => {
   test('getTextValue if node is not textValue type', () => {
     const value = tmb.getTextValue(3)
     expect(value).toBe(null)
+  })
+})
+
+describe('getFirstTextValueId', () => {
+  const templateFixture = {
+    value: [
+      {
+        value: 'Hello, {firstname}!',
+        type: 'textValue',
+      },
+      {
+        value: [
+          {
+            value: 'if text',
+            type: 'textValue',
+          },
+          {
+            value: 'thenElse text',
+            type: 'thenElse',
+          },
+          {
+            value: 'thenElse text',
+            type: 'thenElse',
+          },
+        ],
+        type: 'ifThenElse',
+      },
+    ],
+    type: 'template',
+  }
+  const tmb = new TemplateMessageBuilder(JSON.stringify(templateFixture))
+  test('getTextValue textValue found', () => {
+    const id = tmb.getFirstTextValueId()
+    expect(id).toBe(0)
+  })
+  test('getTextValue if ifNode found', () => {
+    const templateFixture = {
+      value: [
+        {
+          value: [
+            {
+              value: 'if text',
+              type: 'textValue',
+            },
+            {
+              value: 'thenElse text',
+              type: 'thenElse',
+            },
+            {
+              value: 'thenElse text',
+              type: 'thenElse',
+            },
+          ],
+          type: 'ifThenElse',
+        },
+      ],
+      type: 'template',
+    }
+    const tmb = new TemplateMessageBuilder(JSON.stringify(templateFixture))
+    const id = tmb.getFirstTextValueId()
+    expect(id).toBe(1)
+  })
+  test('getTextValue if node not found', () => {
+    const templateFixture = {
+      value: [
+        {
+          value: '',
+          type: 'invalidType',
+        },
+      ],
+      type: 'template',
+    }
+    const tmb = new TemplateMessageBuilder(JSON.stringify(templateFixture))
+    const id = tmb.getFirstTextValueId()
+    expect(id).toBe(null)
+  })
+  test('getTextValue if id does not exist', () => {
+    const templateFixture = {
+      value: [
+        {
+          value: '',
+          type: 'textValue',
+        },
+      ],
+      type: 'template',
+    }
+    const tmb = new TemplateMessageBuilder(JSON.stringify(templateFixture))
+    tmb['templateAst'].value[0].id = undefined
+    const id = tmb.getFirstTextValueId()
+    expect(id).toBe(null)
+  })
+  test('getTextValue if id of ifThenElse does not exist', () => {
+    const templateFixture = {
+      value: [
+        {
+          value: [
+            {
+              value: '',
+              type: 'textValue',
+            },
+            {
+              value: [],
+              type: 'thenElse',
+            },
+            {
+              value: [],
+              type: 'thenElse',
+            },
+          ],
+          type: 'ifThenElse',
+        },
+      ],
+      type: 'template',
+    }
+    const tmb = new TemplateMessageBuilder(JSON.stringify(templateFixture))
+    const ifThenElse = tmb['templateAst'].value[0]
+    if (ifThenElse.type === 'ifThenElse') {
+      ifThenElse.value[0].id = undefined
+    }
+    const id = tmb.getFirstTextValueId()
+    expect(id).toBe(null)
   })
 })
 
@@ -275,7 +411,7 @@ describe('test add/remove inThenElse', () => {
           value: [
             {
               value: '',
-              type: 'if',
+              type: 'textValue',
               id: 2,
             },
             {
@@ -346,7 +482,60 @@ describe('test add/remove inThenElse', () => {
           value: [
             {
               value: '',
-              type: 'if',
+              type: 'textValue',
+              id: 2,
+            },
+            {
+              value: [
+                {
+                  value: '',
+                  type: 'textValue',
+                  id: 3,
+                },
+              ],
+              type: 'thenElse',
+              id: 4,
+            },
+            {
+              value: [
+                {
+                  value: '',
+                  type: 'textValue',
+                  id: 5,
+                },
+              ],
+              type: 'thenElse',
+              id: 6,
+            },
+          ],
+          type: 'ifThenElse',
+          id: 7,
+        },
+        {
+          value: '\nBest regards,',
+          type: 'textValue',
+          id: 8,
+        },
+      ],
+      type: 'template',
+    }
+    expect(tmb.getTemplateAst()).toEqual(expectedResult)
+  })
+
+  test('add ifThenElse to the wrong node and right id', () => {
+    tmb.addIfThenElse(7, 7)
+    const expectedResult = {
+      value: [
+        {
+          value: 'Hello, Bill!',
+          type: 'textValue',
+          id: 1,
+        },
+        {
+          value: [
+            {
+              value: '',
+              type: 'textValue',
               id: 2,
             },
             {
@@ -399,7 +588,7 @@ describe('test add/remove inThenElse', () => {
           value: [
             {
               value: '',
-              type: 'if',
+              type: 'textValue',
               id: 2,
             },
             {
@@ -446,7 +635,7 @@ describe('test add/remove inThenElse', () => {
         {
           value: 'Hello, Bill!\nBest regards,',
           type: 'textValue',
-          id: 9,
+          id: 17,
         },
       ],
       type: 'template',
@@ -465,7 +654,7 @@ describe('test add/remove inThenElse', () => {
           value: [
             {
               value: '',
-              type: 'if',
+              type: 'textValue',
             },
             {
               value: [
@@ -492,7 +681,7 @@ describe('test add/remove inThenElse', () => {
           value: [
             {
               value: '',
-              type: 'if',
+              type: 'textValue',
             },
             {
               value: [
@@ -535,7 +724,7 @@ describe('test add/remove inThenElse', () => {
           value: [
             {
               value: '',
-              type: 'if',
+              type: 'textValue',
               id: 8,
             },
             {
@@ -586,7 +775,7 @@ describe('test add/remove inThenElse', () => {
           value: [
             {
               value: '',
-              type: 'if',
+              type: 'textValue',
               id: 8,
             },
             {
@@ -726,7 +915,7 @@ jakelennard911@gmail.com`
           value: [
             {
               value: 'true',
-              type: 'if',
+              type: 'textValue',
             },
             {
               value: [
@@ -774,7 +963,7 @@ Best regards!`
           value: [
             {
               value: '',
-              type: 'if',
+              type: 'textValue',
             },
             {
               value: [

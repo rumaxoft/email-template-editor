@@ -4,6 +4,7 @@ export class TemplateMessageBuilder {
   idCount: number = 0
 
   constructor(template: string = '{"value": [], "type": "template"}') {
+    if (template === '') template = '{"value": [], "type": "template"}'
     this.templateAst = this.parse(template)
   }
 
@@ -96,6 +97,28 @@ export class TemplateMessageBuilder {
     } else {
       return null
     }
+  }
+
+  /**
+   * returns value of the first TextValue node
+   * @returns {string | null} value of TextValue node
+   */
+  public getFirstTextValueId(): number | null {
+    for (let node of this.templateAst.value) {
+      if (node.type === 'textValue') {
+        if (node.id !== undefined) {
+          return node.id
+        }
+      } else if (node.type === 'ifThenElse') {
+        const [ifNode] = node.value
+        if (ifNode.id !== undefined) {
+          return ifNode.id
+        }
+      } else {
+        return null
+      }
+    }
+    return null
   }
 
   /**
@@ -240,6 +263,8 @@ export class TemplateMessageBuilder {
         const nodeIndex = parentNode.value.indexOf(node)
         parentNode.value.splice(nodeIndex, 1, leftNode, ifThenElseNode, rightNode)
       }
+    } else {
+      return this
     }
     return this
   }
