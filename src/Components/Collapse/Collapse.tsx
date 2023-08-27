@@ -9,12 +9,19 @@ export interface CollapseProps {
   content?: React.ReactElement
   children?: React.ReactElement
   style?: React.CSSProperties
+  className?: string
+  [x: string]: any
 }
 
-const Collapse: React.FC<CollapseProps> = ({ content, children, style }) => {
+const Collapse: React.FC<CollapseProps> = ({ content, children, style, className, ...rest }) => {
   const [open, setOpen] = useState(true)
   return (
-    <div style={style} tabIndex={0} className={`${styles.collapse} ${open && styles.collapseOpen}`}>
+    <div
+      style={style}
+      tabIndex={0}
+      className={`${styles.collapse} ${open && styles.collapseOpen} ${className}`}
+      {...rest}
+    >
       <div className={`${styles.button}`}>
         <Button xs onClick={() => setOpen(!open)}>
           <RiArrowRightSLine className={`${styles.buttonIcon} ${open && styles.buttonIconOpen}`} />
