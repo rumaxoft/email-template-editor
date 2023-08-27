@@ -201,7 +201,7 @@ export class TemplateMessageBuilder {
         value: [
           {
             value: '',
-            type: 'if',
+            type: 'textValue',
             id: this.idCount++,
           },
           {
