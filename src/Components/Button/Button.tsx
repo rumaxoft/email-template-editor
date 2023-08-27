@@ -1,6 +1,6 @@
 import styles from './Button.module.css'
 export interface ButtonProps {
-  level?: 'primary' | 'secondary'
+  level?: 'primary' | 'secondary' | 'error' | 'neutral'
   lg?: boolean
   sm?: boolean
   xs?: boolean
@@ -15,7 +15,7 @@ const Button: React.FC<ButtonProps> = ({ text = 'some text', level, lg, sm, xs, 
     <button
       style={style}
       className={`${styles.btn} 
-    ${level === 'primary' ? styles.primary : level === 'secondary' ? styles.secondary : ''}
+    ${level ? styles[level] : ''}
     ${lg ? styles.lg : ''}
     ${sm ? styles.sm : ''}
     ${xs ? styles.xs : ''}
