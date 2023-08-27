@@ -1,0 +1,84 @@
+.collapse {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 0fr;
+  transition: grid-template-rows 0.2s;
+  padding-left: 2.2rem;
+}
+
+.collapseOpen {
+  grid-template-rows: auto 1fr;
+}
+
+.collapse:focus-visible {
+  outline-style: solid;
+  outline-width: 2px;
+  outline-offset: 2px;
+  outline-color: hsl(var(--bc) / 1);
+}
+
+.button {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: 0;
+  top: 0;
+  z-index: 1;
+}
+
+.buttonIcon {
+  transition: transform 0.2s ease-out;
+}
+
+.buttonIconOpen {
+  transform: rotate(90deg) !important;
+}
+
+.line {
+  display: none;
+  position: absolute;
+  left: 0.9rem;
+  top: 1.8rem;
+  bottom: 0.5rem;
+  border-left-width: 0.1rem;
+  border-left-style: dashed;
+  --tw-bg-opacity: 1;
+  border-color: hsl(var(--b3) / var(--tw-bg-opacity));
+  transition: all 0.2s ease-out;
+}
+
+.collapseOpen .line {
+  display: block;
+}
+
+.buttonIcon {
+  transition: transform 0.2s ease-out;
+}
+
+.collapseTitle {
+  position: relative;
+  grid-column-start: 1;
+  grid-row-start: 1;
+  transition: background-color 0.2s ease-out;
+}
+
+.collapseContent {
+  visibility: hidden;
+  grid-column-start: 1;
+  grid-row-start: 2;
+  min-height: 0;
+  transition: visibility 0.2s;
+  transition:
+    padding 0.2s ease-out,
+    background-color 0.2s ease-out;
+  cursor: unset;
+}
+
+.collapseOpen .collapseContent {
+  visibility: visible;
+  min-height: fit-content;
+  transition:
+    padding 0.2s ease-out,
+    background-color 0.2s ease-out;
+}
