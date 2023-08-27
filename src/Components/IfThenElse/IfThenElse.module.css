@@ -1,24 +1,28 @@
 .ifThenElseContainer {
-  padding: 0.5rem;
   margin-bottom: 0.2rem;
-  padding-left: 2rem;
-  border: 1px solid magenta;
+  display: flex;
+  width: 100%;
+}
+
+.label {
+  box-sizing: border-box;
+  width: 4.6rem;
+  padding-right: 0.4rem;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .ifContainer {
   margin-bottom: 0.2rem;
-  padding: 0.5rem;
-  border: 1px solid red;
+  width: 100%;
 }
 
 .thenContainer {
   margin-bottom: 0.2rem;
-  padding: 0.5rem;
-  border: 1px solid green;
+  width: 100%;
 }
 
 .elseContainer {
   margin-bottom: 0.2rem;
-  padding: 0.5rem;
-  border: 1px solid blue;
+  width: 100%;
 }
