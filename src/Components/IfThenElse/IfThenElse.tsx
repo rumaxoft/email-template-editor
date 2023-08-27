@@ -1,3 +1,5 @@
+import './IfThenElse.css'
+import { useEffect, useRef } from 'react'
 import { RiDeleteBin2Line } from 'react-icons/ri'
 
 import styles from './IfThenElse.module.css'
@@ -19,6 +21,7 @@ export interface IfThenElseProps {
   currentIndex: number
   setCurrentIndex: (value: number) => void
   setActiveTextValueId: (value: number) => void
+  deleteIfThenElse: (id: number) => void
 }
 
 const IfThenElseFC: React.FC<IfThenElseProps> = ({
@@ -29,8 +32,38 @@ const IfThenElseFC: React.FC<IfThenElseProps> = ({
   currentIndex,
   setActiveTextValueId,
   setCurrentIndex,
+  deleteIfThenElse,
+  id,
 }) => {
   const [ifNode, thenNode, elseNode] = value.value
+  const wrapper = useRef<null | HTMLDivElement>(null)
+  const ifThenelse = useRef<null | HTMLDivElement>(null)
+
+  const deleteHandler = (id: number): void => {
+    if (ifThenelse.current && wrapper.current) {
+      ifThenelse.current.classList.add('ifThenElse--remove')
+      setTimeout(() => {
+        if (wrapper.current) {
+          wrapper.current.classList.add('ifThenElse__wrapper--remove')
+        }
+      }, 200)
+      setTimeout(() => {
+        deleteIfThenElse(id)
+      }, 500)
+    }
+  }
+
+  useEffect(() => {
+    if (wrapper.current) {
+      wrapper.current.classList.remove('ifThenElse__wrapper--remove')
+    }
+    setTimeout(() => {
+      if (ifThenelse.current) {
+        ifThenelse.current.classList.remove('ifThenElse--remove')
+      }
+    }, 200)
+  }, [])
+
   const thenElse = () => {
     return (
       <>
@@ -67,6 +100,7 @@ const IfThenElseFC: React.FC<IfThenElseProps> = ({
                     values={values}
                     value={el}
                     setTextValue={setTextValue}
+                    deleteIfThenElse={deleteIfThenElse}
                   />
                 )
               } else {
@@ -108,6 +142,7 @@ const IfThenElseFC: React.FC<IfThenElseProps> = ({
                     values={values}
                     value={el}
                     setTextValue={setTextValue}
+                    deleteIfThenElse={deleteIfThenElse}
                   />
                 )
               } else {
@@ -120,32 +155,36 @@ const IfThenElseFC: React.FC<IfThenElseProps> = ({
     )
   }
   return (
-    <Collapse style={{ marginTop: '0.5rem' }} content={thenElse()}>
-      <div className={`${styles.ifThenElseContainer}`}>
-        <div className={`${styles.label}`}>
-          <Button level='error' style={{ marginRight: 'auto' }} xs>
-            <RiDeleteBin2Line />
-          </Button>
-          <Label level='neutral' xs>
-            if
-          </Label>
-        </div>
-        <div className={`${styles.ifContainer}`}>
-          <TextValue
-            id={ifNode.id || -1}
-            key={ifNode.id}
-            activeTextValueId={activeTextValueId}
-            currentIndex={currentIndex}
-            setCurrentIndex={setCurrentIndex}
-            setActiveTextValueId={setActiveTextValueId}
-            values={values}
-            resizable
-            value={ifNode.value}
-            setTextValue={setTextValue}
-          ></TextValue>
-        </div>
+    <div ref={wrapper} className={`ifThenElse__wrapper ifThenElse__wrapper--remove`}>
+      <div ref={ifThenelse} className={`ifThenElse ifThenElse--remove`}>
+        <Collapse content={thenElse()}>
+          <div className={`${styles.ifThenElseContainer}`}>
+            <div className={`${styles.label}`}>
+              <Button onClick={(e) => deleteHandler(id)} level='error' style={{ marginRight: 'auto' }} xs>
+                <RiDeleteBin2Line />
+              </Button>
+              <Label level='neutral' xs>
+                if
+              </Label>
+            </div>
+            <div className={`${styles.ifContainer}`}>
+              <TextValue
+                id={ifNode.id || -1}
+                key={ifNode.id}
+                activeTextValueId={activeTextValueId}
+                currentIndex={currentIndex}
+                setCurrentIndex={setCurrentIndex}
+                setActiveTextValueId={setActiveTextValueId}
+                values={values}
+                resizable
+                value={ifNode.value}
+                setTextValue={setTextValue}
+              ></TextValue>
+            </div>
+          </div>
+        </Collapse>
       </div>
-    </Collapse>
+    </div>
   )
 }
 

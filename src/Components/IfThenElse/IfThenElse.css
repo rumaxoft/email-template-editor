@@ -1,0 +1,22 @@
+.ifThenElse {
+  padding-top: 0.3rem;
+  transition: all 0.3s ease-out;
+  opacity: 1;
+  transform: translateX(0%);
+}
+
+.ifThenElse--remove {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.ifThenElse__wrapper {
+  max-height: 999px;
+  position: relative;
+  transition: all 0.3s ease-out;
+  overflow: hidden;
+}
+
+.ifThenElse__wrapper--remove {
+  max-height: 5px;
+}
