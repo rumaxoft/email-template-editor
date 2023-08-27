@@ -55,17 +55,21 @@
 }
 
 .value {
-  color: white;
-  background-color: green;
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--b3) / var(--tw-bg-opacity));
+  --tw-text-opacity: 0.8;
+  color: hsl(var(--bc) / var(--tw-text-opacity));
   padding-bottom: 0.2rem;
   white-space: pre-wrap;
   position: relative;
   left: 0.05rem;
 }
 .valueBracketLeft {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--b3) / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
   color: transparent;
-  background-color: green;
-  border-radius: 0.2rem 0 0 0.2rem;
+  border-radius: var(--rounded-btn, 0.5rem) 0 0 var(--rounded-btn, 0.5rem);
   padding-bottom: 0.2rem;
   white-space: pre-wrap;
   position: relative;
@@ -73,9 +77,11 @@
 }
 
 .valueBracketRight {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--b3) / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
   color: transparent;
-  background-color: green;
-  border-radius: 0 0.2rem 0.2rem 0;
+  border-radius: 0 var(--rounded-btn, 0.5rem) var(--rounded-btn, 0.5rem) 0;
   padding-bottom: 0.2rem;
   white-space: pre-wrap;
 }
