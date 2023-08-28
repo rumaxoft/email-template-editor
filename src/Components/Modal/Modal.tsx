@@ -9,12 +9,22 @@ import { Button } from '../Button'
 export interface ModalProps {
   buttonText?: string
   buttonContent?: React.ReactElement
+  headerContent?: React.ReactElement
   children?: React.ReactElement
+  renderChildren?: (setShowModal: (state: boolean) => void) => JSX.Element
   header?: string
   style?: React.CSSProperties
 }
 
-const Modal: React.FC<ModalProps> = ({ buttonText, buttonContent, style, children, header }) => {
+const Modal: React.FC<ModalProps> = ({
+  buttonText,
+  buttonContent,
+  headerContent,
+  style,
+  children,
+  renderChildren,
+  header,
+}) => {
   const [showModal, setShowModal] = useState(false)
   const modalRef = useRef<HTMLDivElement | null>(null)
   const modalRefCallback = useCallback((node: HTMLDivElement) => {
@@ -46,11 +56,15 @@ const Modal: React.FC<ModalProps> = ({ buttonText, buttonContent, style, childre
           <div style={style} className={styles.backdrop} onClick={closeModal}>
             <div className={styles.centered}>
               <div ref={modalRefCallback} tabIndex={0} onKeyDown={handleEscKeydown} className={styles.modal}>
-                <div className={styles.modalHeader}>{header && <h5 className={styles.heading}>{header}</h5>}</div>
+                <div className={styles.modalHeader}>
+                  {header ? <h5 className={styles.heading}>{header}</h5> : headerContent}
+                </div>
                 <button className={styles.closeBtn} onClick={() => setShowModal(false)}>
                   <RiCloseLine style={{ marginBottom: '-3px' }} />
                 </button>
-                <div className={styles.modalContent}>{children}</div>
+                <div className={styles.modalContent}>
+                  {children ? children : renderChildren && renderChildren(setShowModal)}
+                </div>
               </div>
             </div>
           </div>,
