@@ -4,10 +4,11 @@ export function throttle(cb: Function, delay = 200) {
   return (...args: any[]) => {
     if (shouldWait) return
 
-    cb(...args)
+    const returned = cb(...args)
     shouldWait = true
     setTimeout(() => {
       shouldWait = false
     }, delay)
+    return returned
   }
 }
