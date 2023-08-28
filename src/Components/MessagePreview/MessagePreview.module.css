@@ -1,0 +1,37 @@
+.messagePreview {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.message {
+  white-space: pre-wrap;
+  padding: 1rem;
+  line-height: 1.5;
+  text-align: left;
+  border-width: 1px;
+  border-style: solid;
+  border-color: hsl(var(--bc) / var(--tw-border-opacity));
+  --tw-border-opacity: 0.2;
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--b1) / var(--tw-bg-opacity));
+  border-radius: var(--rounded-btn, 0.5rem);
+}
+
+.buttonsWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.footerWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
