@@ -8,7 +8,7 @@ import { TemplateMessageBuilder } from '../../Modules/MessageTemplateEditor/Temp
 import { Button } from '../Button'
 import { IfThenElseFC } from '../IfThenElse'
 import { Label } from '../Label'
-import { Modal } from '../Modal'
+import { MessagePreview } from '../MessagePreview'
 import { TextValue } from '../TextValue'
 
 export interface MessageTemplateEditorProps {
@@ -149,10 +149,17 @@ const MessageTemplateEditor: React.FC<MessageTemplateEditorProps> = ({
         })}
       </div>
       <div className={`${styles.footerWrapper}`}>
-        <Button>
-          <RiPresentationFill />
-          preview
-        </Button>
+        <MessagePreview
+          buttonContent={
+            <Button>
+              <RiPresentationFill />
+              preview
+            </Button>
+          }
+          template={template}
+          values={values}
+          setValues={setValues}
+        />
         <Button level='neutral'>
           <RiSave3Line />
           save
