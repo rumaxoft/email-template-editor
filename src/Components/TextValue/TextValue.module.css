@@ -6,6 +6,7 @@
   width: 100%;
   box-sizing: border-box;
   font-family: inherit;
+  text-align: left;
   min-height: 2rem;
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
@@ -41,8 +42,7 @@
   pointer-events: none;
   box-sizing: border-box;
   font-family: inherit;
-  font-feature-settings: inherit;
-  font-variation-settings: inherit;
+  text-align: left;
   flex-shrink: 1;
   min-height: 2rem;
   padding: 0.5rem 1rem;
