@@ -4,24 +4,33 @@ export interface InputProps {
   placeholder?: string
   value: string
   setValue: (value: string) => void
+  id?: string
+  label?: string
 }
 
-const Input: React.FC<InputProps> = ({ placeholder, value, setValue, style, ...rest }) => {
+const Input: React.FC<InputProps> = ({ placeholder, id, label, value, setValue, style, ...rest }) => {
   const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
     setValue(e.currentTarget.value)
   }
   return (
-    <input
-      style={style}
-      className={`${styles.input} 
-    `}
-      onInput={(e) => {
-        handleInput(e)
-      }}
-      placeholder={placeholder}
-      value={value}
-      {...rest}
-    />
+    <div className={`${styles.wrapper}`}>
+      <input
+        style={style}
+        className={`${styles.input} ${label && styles.inputLabeled}`}
+        id={id}
+        onInput={(e) => {
+          handleInput(e)
+        }}
+        placeholder={placeholder}
+        value={value}
+        {...rest}
+      />
+      {label && (
+        <label className={`${styles.inputLabel}`} htmlFor={id}>
+          {label}
+        </label>
+      )}
+    </div>
   )
 }
 
