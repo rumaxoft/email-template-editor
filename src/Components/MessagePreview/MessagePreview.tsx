@@ -39,6 +39,8 @@ const MessagePreview: React.FC<MessagePreviewProps> = ({ template = '', values, 
                 <Input
                   key={key}
                   placeholder={key}
+                  label={key}
+                  id={key}
                   value={values[key]}
                   setValue={(value) => {
                     setValues({ ...values, [key]: value })
