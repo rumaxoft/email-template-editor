@@ -29,7 +29,7 @@ const MessagePreview: React.FC<MessagePreviewProps> = ({ template = '', values, 
     <Modal
       buttonContent={buttonContent}
       headerContent={<h2 style={{ paddingTop: '2rem', textAlign: 'center', fontSize: '2rem' }}>Message Preview</h2>}
-      renderChildren={(setShowModal) => (
+      renderChildren={(closeModal) => (
         <div style={{ width: '60vw', height: '70vh', overflow: 'auto', paddingLeft: '4rem', paddingRight: '4rem' }}>
           <div className={`${styles.messagePreview}`}>
             <div className={`${styles.message}`}>{message}</div>
@@ -49,7 +49,7 @@ const MessagePreview: React.FC<MessagePreviewProps> = ({ template = '', values, 
               ))}
             </div>
             <div className={`${styles.footerWrapper}`}>
-              <Button onClick={() => setShowModal && setShowModal(false)} level='error'>
+              <Button onClick={() => closeModal && closeModal()} level='error'>
                 <RiCloseCircleLine />
                 close
               </Button>

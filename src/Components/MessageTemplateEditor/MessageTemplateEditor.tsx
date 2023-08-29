@@ -18,7 +18,7 @@ export interface MessageTemplateEditorProps {
   values: Record<string, string>
   setValues: (values: Record<string, string>) => void
   callbackSave: (template: string) => Promise<void>
-  setShowModal?: (state: boolean) => void
+  closeModal?: () => void
 }
 
 const MessageTemplateEditor: React.FC<MessageTemplateEditorProps> = ({
@@ -28,7 +28,7 @@ const MessageTemplateEditor: React.FC<MessageTemplateEditorProps> = ({
   values,
   setValues,
   callbackSave,
-  setShowModal,
+  closeModal,
 }) => {
   const tmb = useMemo(() => new TemplateMessageBuilder(template), [template])
 
@@ -164,7 +164,7 @@ const MessageTemplateEditor: React.FC<MessageTemplateEditorProps> = ({
           <RiSave3Line />
           save
         </Button>
-        <Button onClick={() => setShowModal && setShowModal(false)} level='error'>
+        <Button onClick={() => closeModal && closeModal()} level='error'>
           <RiCloseCircleLine />
           close
         </Button>

@@ -11,7 +11,7 @@ export interface ModalProps {
   buttonContent?: React.ReactElement
   headerContent?: React.ReactElement
   children?: React.ReactElement
-  renderChildren?: (setShowModal: (state: boolean) => void) => JSX.Element
+  renderChildren?: (closeModal: () => void) => JSX.Element
   header?: string
   style?: React.CSSProperties
 }
@@ -27,6 +27,7 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
   const [showModal, setShowModal] = useState(false)
   const modalRef = useRef<HTMLDivElement | null>(null)
+  const modalWrapper = useRef<HTMLDivElement | null>(null)
   const modalRefCallback = useCallback((node: HTMLDivElement) => {
     node?.focus()
     document.body.style.setProperty('overflow', 'hidden')
@@ -39,31 +40,43 @@ const Modal: React.FC<ModalProps> = ({
   const handleEscKeydown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Escape') {
       e.stopPropagation()
-      setShowModal(false)
+      animatedClose()
     }
   }
-  const closeModal = (e: MouseEvent<HTMLElement>) => {
+
+  const animatedClose = () => {
+    if (modalWrapper.current) {
+      console.log(modalWrapper.current)
+      modalWrapper.current.classList.add(styles.removing)
+    }
+    setTimeout(() => {
+      setShowModal(false)
+    }, 200)
+  }
+
+  const closeModalByBackdrop = (e: MouseEvent<HTMLElement>) => {
     if (e.target === e.currentTarget) {
-      setShowModal(false)
+      animatedClose()
     }
   }
+
   return (
     <>
       {buttonText && <Button onClick={() => setShowModal(true)}>{buttonText}</Button>}
       {buttonContent && cloneElement(buttonContent, { onClick: () => setShowModal(true) })}
       {showModal &&
         createPortal(
-          <div style={style} className={styles.backdrop} onClick={closeModal}>
+          <div ref={modalWrapper} style={style} className={styles.backdrop} onClick={closeModalByBackdrop}>
             <div className={styles.centered}>
               <div ref={modalRefCallback} tabIndex={0} onKeyDown={handleEscKeydown} className={styles.modal}>
                 <div className={styles.modalHeader}>
                   {header ? <h5 className={styles.heading}>{header}</h5> : headerContent}
                 </div>
-                <button className={styles.closeBtn} onClick={() => setShowModal(false)}>
+                <button className={styles.closeBtn} onClick={animatedClose}>
                   <RiCloseLine style={{ marginBottom: '-3px' }} />
                 </button>
                 <div className={styles.modalContent}>
-                  {children ? children : renderChildren && renderChildren(setShowModal)}
+                  {children ? children : renderChildren && renderChildren(animatedClose)}
                 </div>
               </div>
             </div>

@@ -33,14 +33,14 @@ function App() {
         headerContent={
           <h2 style={{ paddingTop: '2rem', textAlign: 'center', fontSize: '2rem' }}>Message Template Editor</h2>
         }
-        renderChildren={(setShowModal) => (
+        renderChildren={(closeModal) => (
           <div style={{ width: '60vw', height: '70vh', overflow: 'auto', paddingLeft: '4rem', paddingRight: '4rem' }}>
             <MessageTemplateEditor
               template={JSON.stringify(templateSource)}
               values={values}
               setValues={setValues}
               callbackSave={callbackSave}
-              setShowModal={setShowModal}
+              closeModal={closeModal}
             />
           </div>
         )}

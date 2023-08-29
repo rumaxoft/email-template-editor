@@ -136,6 +136,10 @@
   background: whitesmoke;
 }
 
+.removing {
+  animation: fade-out 0.3s ease-out;
+}
+
 @keyframes modal-pop {
   0% {
     transform: scale(var(--btn-focus-scale, 0.98));
@@ -154,5 +158,14 @@
   }
   100% {
     opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
   }
 }
