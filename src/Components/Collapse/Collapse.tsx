@@ -16,12 +16,7 @@ export interface CollapseProps {
 const Collapse: React.FC<CollapseProps> = ({ content, children, style, className, ...rest }) => {
   const [open, setOpen] = useState(true)
   return (
-    <div
-      style={style}
-      tabIndex={0}
-      className={`${styles.collapse} ${open && styles.collapseOpen} ${className}`}
-      {...rest}
-    >
+    <div style={style} className={`${styles.collapse} ${open && styles.collapseOpen} ${className}`} {...rest}>
       <div className={`${styles.button}`}>
         <Button xs onClick={() => setOpen(!open)}>
           <RiArrowRightSLine className={`${styles.buttonIcon} ${open && styles.buttonIconOpen}`} />
