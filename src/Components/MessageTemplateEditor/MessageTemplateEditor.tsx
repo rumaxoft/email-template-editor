@@ -26,7 +26,6 @@ const MessageTemplateEditor: React.FC<MessageTemplateEditorProps> = ({
   style,
   template = '',
   values,
-  setValues,
   callbackSave,
   closeModal,
 }) => {
@@ -35,6 +34,7 @@ const MessageTemplateEditor: React.FC<MessageTemplateEditorProps> = ({
   const [astValue, setAstValue] = useState(tmb.getTemplateAst())
   const [currentIndex, setCurrentIndex] = useState(0)
   const [activeTextValueId, setActiveTextValueId] = useState(-1)
+  const [innerValues, setValues] = useState(values)
 
   const setValue = (value: string, id: number) => {
     tmb.updateTextValue(value, id)
@@ -75,7 +75,7 @@ const MessageTemplateEditor: React.FC<MessageTemplateEditorProps> = ({
       <div className={`${styles.buttonsWrapper}`}>
         <div className={`${styles.varButtons}`}>
           <div>add value:</div>
-          {Object.keys(values).map((key) => (
+          {Object.keys(innerValues).map((key) => (
             <Button
               key={key}
               onClick={() => {
@@ -120,7 +120,7 @@ const MessageTemplateEditor: React.FC<MessageTemplateEditorProps> = ({
                 key={el.id}
                 setCurrentIndex={setCurrentIndex}
                 setActiveTextValueId={setActiveTextValueId}
-                values={values}
+                values={innerValues}
                 resizable
                 value={el.value}
                 activeTextValueId={activeTextValueId}
@@ -135,7 +135,7 @@ const MessageTemplateEditor: React.FC<MessageTemplateEditorProps> = ({
                 key={typeof el.id !== 'undefined' ? el.id : -1}
                 setCurrentIndex={setCurrentIndex}
                 setActiveTextValueId={setActiveTextValueId}
-                values={values}
+                values={innerValues}
                 value={el}
                 activeTextValueId={activeTextValueId}
                 currentIndex={currentIndex}
@@ -157,7 +157,7 @@ const MessageTemplateEditor: React.FC<MessageTemplateEditorProps> = ({
             </Button>
           }
           template={tmb.generateTemplate()}
-          values={values}
+          values={innerValues}
           setValues={setValues}
         />
         <Button level='neutral'>
