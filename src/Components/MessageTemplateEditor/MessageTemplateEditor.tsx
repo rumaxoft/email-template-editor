@@ -156,7 +156,7 @@ const MessageTemplateEditor: React.FC<MessageTemplateEditorProps> = ({
               preview
             </Button>
           }
-          template={template}
+          template={tmb.generateTemplate()}
           values={values}
           setValues={setValues}
         />
