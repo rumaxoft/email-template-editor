@@ -8,6 +8,7 @@ import { TemplateMessageBuilder } from '../../Modules/MessageTemplateEditor/Temp
 import { Button } from '../Button'
 import { IfThenElseFC } from '../IfThenElse'
 import { Label } from '../Label'
+import { Loading } from '../Loading'
 import { MessagePreview } from '../MessagePreview'
 import { TextValue } from '../TextValue'
 
@@ -17,7 +18,7 @@ export interface MessageTemplateEditorProps {
   template?: string
   values: Record<string, string>
   setValues: (values: Record<string, string>) => void
-  callbackSave: (template: string) => Promise<void>
+  callbackSave: (template: string) => Promise<true | null>
   closeModal?: () => void
 }
 
@@ -35,6 +36,7 @@ const MessageTemplateEditor: React.FC<MessageTemplateEditorProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0)
   const [activeTextValueId, setActiveTextValueId] = useState(-1)
   const [innerValues, setValues] = useState(values)
+  const [saving, setSaving] = useState(false)
 
   const setValue = (value: string, id: number) => {
     tmb.updateTextValue(value, id)
@@ -60,6 +62,17 @@ const MessageTemplateEditor: React.FC<MessageTemplateEditorProps> = ({
   const addIfThenElse = (id: number, cursorIndex: number): void => {
     tmb.addIfThenElse(id, currentIndex)
     setAstValue(tmb.getTemplateAst())
+  }
+
+  const saveTemplate = async () => {
+    setSaving(true)
+    const result = await callbackSave(tmb.generateTemplate())
+    if (result) {
+      console.log('saved successfully')
+    } else {
+      console.log('something went wrong')
+    }
+    setSaving(false)
   }
 
   useEffect(() => {
@@ -160,8 +173,8 @@ const MessageTemplateEditor: React.FC<MessageTemplateEditorProps> = ({
           values={innerValues}
           setValues={setValues}
         />
-        <Button level='neutral'>
-          <RiSave3Line />
+        <Button onClick={saveTemplate} level='neutral'>
+          {saving ? <Loading /> : <RiSave3Line />}
           save
         </Button>
         <Button onClick={() => closeModal && closeModal()} level='error'>
