@@ -46,7 +46,6 @@ const Modal: React.FC<ModalProps> = ({
 
   const animatedClose = () => {
     if (modalWrapper.current) {
-      console.log(modalWrapper.current)
       modalWrapper.current.classList.add(styles.removing)
     }
     setTimeout(() => {
