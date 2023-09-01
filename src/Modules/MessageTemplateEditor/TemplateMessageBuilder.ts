@@ -23,10 +23,12 @@ export class TemplateMessageBuilder {
         if (node.type === 'textValue') {
           const resolvedString = node.value.replace(/\{.+?\}/g, (match) => {
             const valueKey = match.slice(1, -1)
-            if (values[valueKey]) {
+            if (valueKey in values && values[valueKey]) {
               return values[valueKey]
-            } else {
+            } else if (valueKey in values && !values[valueKey]) {
               return ''
+            } else {
+              return match
             }
           })
           message += resolvedString
@@ -35,10 +37,12 @@ export class TemplateMessageBuilder {
           const [ifNode, thenNode, elseNode] = node.value
           const resolvedIfString = ifNode.value.replace(/\{.+?\}/g, (match) => {
             const valueKey = match.slice(1, -1)
-            if (values[valueKey]) {
+            if (valueKey in values && values[valueKey]) {
               return values[valueKey]
-            } else {
+            } else if (valueKey in values && !values[valueKey]) {
               return ''
+            } else {
+              return match
             }
           })
           if (resolvedIfString.length > 0) {

@@ -861,6 +861,7 @@ jakelennard911@gmail.com`
       firstname: 'Bill',
       lastname: 'Gates',
       company: 'Bill & Melinda Gates Foundation',
+      position: '',
     })
     const expectedResult = `Hello, Bill Gates!
 
@@ -877,6 +878,8 @@ jakelennard911@gmail.com`
     const message = TemplateMessageBuilder.generateMessageText(templateString, {
       firstname: 'Bill',
       lastname: 'Gates',
+      company: '',
+      position: '',
     })
     const expectedResult = `Hello, Bill Gates!
 
@@ -892,6 +895,9 @@ jakelennard911@gmail.com`
   test('generate message text with one variables undefined', () => {
     const message = TemplateMessageBuilder.generateMessageText(templateString, {
       firstname: 'Bill',
+      lastname: '',
+      company: '',
+      position: '',
     })
     const expectedResult = `Hello, Bill !
 
@@ -947,6 +953,54 @@ jakelennard911@gmail.com`
     }
     const message = TemplateMessageBuilder.generateMessageText(JSON.stringify(template), {})
     const expectedResult = `Hello, Bill!
+This text should be shown.
+Best regards!`
+    expect(message).toBe(expectedResult)
+  })
+
+  test('generate message text with variable(word in curly braces) not in values', () => {
+    const template = {
+      value: [
+        {
+          value: 'Hello, Bill {lastnameIsNotInValues}!\n',
+          type: 'textValue',
+        },
+        {
+          value: [
+            {
+              value: '{lastnameIsNotInValues}',
+              type: 'textValue',
+            },
+            {
+              value: [
+                {
+                  value: 'This text should be shown.',
+                  type: 'textValue',
+                },
+              ],
+              type: 'thenElse',
+            },
+            {
+              value: [
+                {
+                  value: 'This text should not be shown.',
+                  type: 'textValue',
+                },
+              ],
+              type: 'thenElse',
+            },
+          ],
+          type: 'ifThenElse',
+        },
+        {
+          value: '\nBest regards!',
+          type: 'textValue',
+        },
+      ],
+      type: 'template',
+    }
+    const message = TemplateMessageBuilder.generateMessageText(JSON.stringify(template), {})
+    const expectedResult = `Hello, Bill {lastnameIsNotInValues}!
 This text should be shown.
 Best regards!`
     expect(message).toBe(expectedResult)
