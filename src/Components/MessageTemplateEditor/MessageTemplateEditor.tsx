@@ -55,13 +55,15 @@ const MessageTemplateEditor: React.FC<MessageTemplateEditorProps> = ({
   }
 
   const deleteIfThenElse = (id: number): void => {
-    tmb.removeIfThenElse(id)
+    const nextTextValueId = tmb.removeIfThenElse(id)
     setAstValue(tmb.getTemplateAst())
+    setActiveTextValueId(nextTextValueId)
   }
 
   const addIfThenElse = (id: number, cursorIndex: number): void => {
-    tmb.addIfThenElse(id, currentIndex)
+    const nextTextValueId = tmb.addIfThenElse(id, currentIndex)
     setAstValue(tmb.getTemplateAst())
+    setActiveTextValueId(nextTextValueId)
   }
 
   const saveTemplate = async () => {
