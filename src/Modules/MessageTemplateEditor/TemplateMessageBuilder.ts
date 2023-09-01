@@ -214,9 +214,10 @@ export class TemplateMessageBuilder {
    * adds IfThenElse node to TextValue node
    * @param {number} id - id of Text node.
    * @param {number} cursorIndex - index under cursor in the TextValue node.
-   * @returns {TemplateMessageBuilder} instance of the TemplateMessageBuilder for method chaining
+   * @returns {number} - id of the next TextValue node after added IfThenElse node
    */
-  public addIfThenElse(id: number, cursorIndex: number): TemplateMessageBuilder {
+  public addIfThenElse(id: number, cursorIndex: number): number {
+    let nextTextValueId = -1
     const [node, parentNode] = this.findById(id)
     if (node && node.type === 'textValue') {
       const leftNode = {
@@ -260,7 +261,7 @@ export class TemplateMessageBuilder {
       const rightNode = {
         value: node.value.slice(cursorIndex),
         type: 'textValue',
-        id: this.idCount++,
+        id: (nextTextValueId = this.idCount++),
       } as TextValue
 
       if (parentNode && (parentNode.type === 'template' || parentNode.type === 'thenElse')) {
@@ -268,17 +269,18 @@ export class TemplateMessageBuilder {
         parentNode.value.splice(nodeIndex, 1, leftNode, ifThenElseNode, rightNode)
       }
     } else {
-      return this
+      return nextTextValueId
     }
-    return this
+    return nextTextValueId
   }
 
   /**
    * removes IfThenElse node from TextValue node
    * @param {number} id id of the IfThenElse node
-   * @returns {TemplateMessageBuilder} instance of the TemplateMessageBuilder for method chaining
+   * @returns {number} - id of the next TextValue node after removed IfThenElse node
    */
-  public removeIfThenElse(id: number): TemplateMessageBuilder {
+  public removeIfThenElse(id: number): number {
+    let nextTextValueId = -1
     const [node, parentNode] = this.findById(id)
     if (
       node &&
@@ -293,13 +295,13 @@ export class TemplateMessageBuilder {
         const concatenated = {
           value: prevNode.value + nextNode.value,
           type: 'textValue',
-          id: this.idCount++,
+          id: (nextTextValueId = this.idCount++),
         } as TextValue
         parentNode.value.splice(nodeIndex - 1, 3, concatenated)
       } else {
         parentNode.value.splice(nodeIndex, 1)
       }
     }
-    return this
+    return nextTextValueId
   }
 }

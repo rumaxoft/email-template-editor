@@ -399,7 +399,7 @@ describe('test add/remove inThenElse', () => {
   const tmb = new TemplateMessageBuilder()
   test('add ifThenElse', () => {
     tmb.updateTextValue('Hello, Bill!\nBest regards,', 0)
-    tmb.addIfThenElse(0, 12)
+    const nextTextValueId = tmb.addIfThenElse(0, 12)
     const expectedResult = {
       value: [
         {
@@ -449,6 +449,7 @@ describe('test add/remove inThenElse', () => {
       type: 'template',
     }
     expect(tmb.getTemplateAst()).toEqual(expectedResult)
+    expect(nextTextValueId).toBe(8)
   })
 
   test('add ifThenElse wrong parent', () => {
@@ -629,7 +630,7 @@ describe('test add/remove inThenElse', () => {
   })
 
   test('remove ifThenElse', () => {
-    tmb.removeIfThenElse(7)
+    const nextTextValueId = tmb.removeIfThenElse(7)
     const expectedResult = {
       value: [
         {
@@ -641,6 +642,7 @@ describe('test add/remove inThenElse', () => {
       type: 'template',
     }
     expect(tmb.getTemplateAst()).toEqual(expectedResult)
+    expect(nextTextValueId).toBe(17)
   })
 
   test('remove ifThenElse without concatenation', () => {
