@@ -893,7 +893,7 @@ jakelennard911@gmail.com`
     const message = TemplateMessageBuilder.generateMessageText(templateString, {
       firstname: 'Bill',
     })
-    const expectedResult = `Hello, Bill {lastname}!
+    const expectedResult = `Hello, Bill !
 
 I just went through your profile and I would love to join your network!
 Where do you work at the moment?

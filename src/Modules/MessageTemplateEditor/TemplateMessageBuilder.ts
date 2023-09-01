@@ -26,7 +26,7 @@ export class TemplateMessageBuilder {
             if (values[valueKey]) {
               return values[valueKey]
             } else {
-              return match
+              return ''
             }
           })
           message += resolvedString
