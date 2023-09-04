@@ -19,6 +19,7 @@ export interface MessageTemplateEditorProps {
   values: Record<string, string>
   setValues: (values: Record<string, string>) => void
   callbackSave: (template: string) => Promise<true | null>
+  refreshData: () => Promise<void>
   closeModal?: () => void
 }
 
@@ -29,6 +30,7 @@ const MessageTemplateEditor: React.FC<MessageTemplateEditorProps> = ({
   values,
   callbackSave,
   closeModal,
+  refreshData,
 }) => {
   const tmb = useMemo(() => new TemplateMessageBuilder(template), [template])
 
@@ -71,6 +73,7 @@ const MessageTemplateEditor: React.FC<MessageTemplateEditorProps> = ({
     const result = await callbackSave(tmb.generateTemplate())
     if (result) {
       console.log('saved successfully')
+      await refreshData()
     } else {
       console.log('something went wrong')
     }

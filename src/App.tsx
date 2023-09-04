@@ -30,22 +30,27 @@ function App() {
     return templateRepository.setTemplate(template)
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const arrVarNames = await templateRepository.getArrVarNames()
-      if (arrVarNames) {
-        setValues(arrVarNames.reduce((acc, val) => ({ ...acc, [val]: '' }), {}))
-      } else {
-        setValues(defaultArrVarNames.reduce((acc, val) => ({ ...acc, [val]: '' }), {}))
-      }
-      const template = await templateRepository.getTemplate()
-      if (template) {
-        setTemplate(template)
-      }
-      // waiting test loading effect
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      setLoading(false)
+  const fetchData = async () => {
+    const arrVarNames = await templateRepository.getArrVarNames()
+    if (arrVarNames) {
+      setValues(arrVarNames.reduce((acc, val) => ({ ...acc, [val]: '' }), {}))
+    } else {
+      setValues(defaultArrVarNames.reduce((acc, val) => ({ ...acc, [val]: '' }), {}))
     }
+    const template = await templateRepository.getTemplate()
+    if (template) {
+      setTemplate(template)
+    }
+    // waiting test loading effect
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    setLoading(false)
+  }
+
+  const refreshData = async () => {
+    await fetchData()
+  }
+
+  useEffect(() => {
     fetchData()
   }, [])
 
@@ -76,6 +81,7 @@ function App() {
               setValues={setValues}
               callbackSave={callbackSave}
               closeModal={closeModal}
+              refreshData={refreshData}
             />
           </div>
         )}
@@ -98,6 +104,7 @@ function App() {
               setValues={setValues}
               callbackSave={callbackSave}
               closeModal={closeModal}
+              refreshData={refreshData}
             />
           </div>
         )}
