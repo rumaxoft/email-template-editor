@@ -2,6 +2,7 @@
   "name": "message-template-editor",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://github.com/rumaxoft/email-template-editor",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -25,7 +26,9 @@
     "lint:es": "eslint --ext .js,.jsx,.ts,.tsx src",
     "lint:es:fix": "npm run lint:es -- --fix",
     "lint:css": "stylelint src",
-    "lint:css:fix": "npm run lint:css -- --fix"
+    "lint:css:fix": "npm run lint:css -- --fix",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "browserslist": {
     "production": [
@@ -44,6 +47,7 @@
     "eslint-config-prettier": "^8.8.0",
     "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-prettier": "^5.0.0",
+    "gh-pages": "^6.0.0",
     "prettier": "^3.0.0",
     "stylelint": "^15.10.2",
     "stylelint-config-clean-order": "^5.0.1",
