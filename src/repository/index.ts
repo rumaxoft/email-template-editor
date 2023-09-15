@@ -20,7 +20,7 @@ const delayDb = (db: TemplateRepositoryDb, delay = 200) => {
   return db
 }
 
-const delayedDb = delayDb(templateDb, 1000)
+const delayedDb = delayDb(templateDb, 200)
 
 const templateRepository = new TemplateRepository(delayedDb)
 

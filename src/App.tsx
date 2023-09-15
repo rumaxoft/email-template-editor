@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import './App.css'
 
-import { RiEditCircleFill } from 'react-icons/ri'
+import { RiEditCircleFill, RiGithubFill } from 'react-icons/ri'
 
 import styles from './App.module.css'
 import { Button } from './Components/Button'
@@ -42,7 +42,7 @@ function App() {
       setTemplate(template)
     }
     // waiting test loading effect
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 500))
     setLoading(false)
   }
 
@@ -56,6 +56,9 @@ function App() {
 
   return (
     <div className='App'>
+      <a className={`${styles.githubLink}`} href='https://github.com/rumaxoft/email-template-editor'>
+        <RiGithubFill />
+      </a>
       {loading && (
         <div className={`${styles.loading}`}>
           <Loading lg />
