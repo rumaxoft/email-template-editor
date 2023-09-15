@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/rumaxoft/email-template-editor/static/css/main.c95977de.css",
+    "main.js": "/rumaxoft/email-template-editor/static/js/main.844c4168.js",
+    "static/js/787.cd85c39c.chunk.js": "/rumaxoft/email-template-editor/static/js/787.cd85c39c.chunk.js",
+    "index.html": "/rumaxoft/email-template-editor/index.html",
+    "main.c95977de.css.map": "/rumaxoft/email-template-editor/static/css/main.c95977de.css.map",
+    "main.844c4168.js.map": "/rumaxoft/email-template-editor/static/js/main.844c4168.js.map",
+    "787.cd85c39c.chunk.js.map": "/rumaxoft/email-template-editor/static/js/787.cd85c39c.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c95977de.css",
+    "static/js/main.844c4168.js"
+  ]
+}
