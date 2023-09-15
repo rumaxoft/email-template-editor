@@ -2,7 +2,7 @@
   "name": "message-template-editor",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://github.com/rumaxoft/email-template-editor",
+  "homepage": "https://rumaxoft.github.com/email-template-editor",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
